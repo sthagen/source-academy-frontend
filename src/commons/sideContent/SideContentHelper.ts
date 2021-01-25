@@ -1,7 +1,8 @@
 import { DebuggerContext, WorkspaceLocation } from '../workspace/WorkspaceTypes';
+import { sampleTab } from './SideContentSampleTab';
 import { SideContentTab } from './SideContentTypes';
 
-const potentialTabs: SideContentTab[] = [];
+const potentialTabs: SideContentTab[] = [sampleTab];
 
 const currentlyActiveTabsLabel: Map<WorkspaceLocation, string[]> = new Map<
   WorkspaceLocation,
