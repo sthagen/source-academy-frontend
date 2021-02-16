@@ -40,6 +40,7 @@ import SideContentFaceapiDisplay from '../../commons/sideContent/SideContentFace
 import SideContentInspector from '../../commons/sideContent/SideContentInspector';
 import SideContentListVisualizer from '../../commons/sideContent/SideContentListVisualizer';
 import SideContentRemoteExecution from '../../commons/sideContent/SideContentRemoteExecution';
+import SideContentSound from '../../commons/sideContent/SideContentSound';
 import SideContentSubstVisualizer from '../../commons/sideContent/SideContentSubstVisualizer';
 import { SideContentTab, SideContentType } from '../../commons/sideContent/SideContentTypes';
 import SideContentVideoDisplay from '../../commons/sideContent/SideContentVideoDisplay';
@@ -544,6 +545,11 @@ const Playground: React.FC<PlaygroundProps> = props => {
       // Enable Face API Display only when 'MACHINELEARNING' is selected
       tabs.push(FaceapiDisplayTab);
     }
+    if (props.externalLibraryName === ExternalLibraryName.SOUNDS ||
+      props.externalLibraryName === ExternalLibraryName.ALL) {
+        // Enable SOUND only when 'SOUNDS' is selected
+        tabs.push(SoundTab);
+    }
     if (props.sourceChapter >= 2 && !usingRemoteExecution) {
       // Enable Data Visualizer for Source Chapter 2 and above
       tabs.push(listVisualizerTab);
@@ -782,6 +788,14 @@ const FaceapiDisplayTab: SideContentTab = {
   label: 'Face API Display',
   iconName: IconNames.MUGSHOT,
   body: <SideContentFaceapiDisplay />,
+  toSpawn: () => true
+};
+
+const SoundTab: SideContentTab = {
+  label: 'Sound',
+  iconName: IconNames.MUSIC,
+  body: <SideContentSound />,
+  //id: SideContentType.Sound,
   toSpawn: () => true
 };
 

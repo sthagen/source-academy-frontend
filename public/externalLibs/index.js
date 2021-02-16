@@ -34,6 +34,7 @@ function loadAllLibs() {
     '/externalLibs/sound/sounds.js',
     '/externalLibs/sound/soundToneMatrix.js',
     '/externalLibs/sound/microphone.js',
+    '/externalLibs/sound/riffwave.js',
     // graphics
     '/externalLibs/graphics/gl-matrix.js',
     '/externalLibs/graphics/webGLhi_graph.js',

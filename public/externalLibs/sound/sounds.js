@@ -59,6 +59,18 @@ function discretize_from(wave, duration, elapsed_duration, sample_length, data) 
     }
 }
 
+function raw_to_audio(_data) {
+    data = copy(_data);
+    data = simple_filter(data);
+    data = quantize(data);
+    var riffwave = new RIFFWAVE();
+    riffwave.header.sampleRate = FS;
+    riffwave.header.numChannels = 1;
+    riffwave.header.bitsPerSample = 16;
+    riffwave.Make(data);
+    var audio = new Audio(riffwave.dataURI);
+    return audio;
+}
 // ---------------------------------------------
 // Source API for Students
 // ---------------------------------------------
@@ -224,6 +236,8 @@ function play_unsafe(sound) {
     }
 }
 
+let audio = null;
+
 // Fully processes a sound before playback
 // Frontloads processing so the sound plays back properly,
 //   but possibly with a delay
@@ -270,15 +284,39 @@ function play(sound) {
             prev_value = channel[i];
         }
 
+        // quantize
+        for (let i = 0; i < channel.length; i++) {
+            channel[i] = Math.floor(channel[i] * 32767.999);
+        }
+
         // Connect data to output destination
-        let source = _audioplayer.createBufferSource();
-        source.buffer = theBuffer;
+        //let source = _audioplayer.createBufferSource();
+
+        let data = [];
+        for (i = 0; i < channel.length; i++) {
+            data[i] = channel[i];
+        }
+        let riffwave = new RIFFWAVE();
+        riffwave.header.sampleRate = FS;
+        riffwave.header.numChannels = 1;
+        riffwave.header.bitsPerSample = 16;
+        riffwave.Make(data);
+        audio = new Audio(riffwave.dataURI);
+        //source.buffer = theBuffer;
         
-        source.connect(_audioplayer.destination);
+        let source2 = _audioplayer.createMediaElementSource(audio);
+        let _webplayer = document.getElementById("sound-tab-player");
+
+        _webplayer.src = riffwave.dataURI;
+        source2.connect(_audioplayer.destination);
+        
+
         _playing = true;
-        source.start();
-        source.onended = () => {
-            source.disconnect(_audioplayer.destination);
+        audio.play();
+        //_webplayer.play();
+        //source2.start();
+        audio.onended = () => {
+            source2.disconnect(_audioplayer.destination);
             _playing = false;
         }
 
@@ -324,6 +362,25 @@ function play_concurrently(sound) {
 
             prev_value = channel[i];
         }
+		
+		//Trying to transfer to audio tag
+		/*let anotherArray = new Float32Array();
+		theBuffer.copyFromChannel(anotherArray,0,0); 
+		const blob = new Blob([anotherArray], { type: "audio/wav" });
+		const url = window.URL.createObjectURL(blob); //creates a URL for the blob
+		
+		var audio = document.createElement('audio');
+		audio.src = url;
+		audio.play();
+		*/
+		
+		
+		/* Trying to implement _audioplayer.resume, _audioplayer.suspend
+		var btn = document.getElementById("soundButton")
+		btn.innerHTML = "Pause";
+		btn.onclick =_audioplayer.suspend;
+		*/
+		
 
         // Connect data to output destination
         let source = _audioplayer.createBufferSource();
