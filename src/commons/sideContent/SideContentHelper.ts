@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 
 import { DebuggerContext, WorkspaceLocation } from '../workspace/WorkspaceTypes';
 import { Modules, ModuleSideContent, SideContentTab, SideContentType } from './SideContentTypes';
@@ -40,7 +41,9 @@ export const getModuleTabs = (debuggerContext: DebuggerContext): SideContentTab[
   const rawModuleTabs = debuggerContext.context?.modules as Modules[] | undefined;
   if (rawModuleTabs == null) return [];
   // Pass React into functions
-  const unprocessedTabs: ModuleSideContent[] = rawModuleTabs.map((tab: any) => tab(React));
+  const unprocessedTabs: ModuleSideContent[] = rawModuleTabs.map((tab: any) =>
+    tab(React, ReactDOM)
+  );
   // Initialize module side contents to convert to SideContentTab type
   const moduleTabs: SideContentTab[] = unprocessedTabs.map((sideContent: ModuleSideContent) => ({
     ...sideContent,
