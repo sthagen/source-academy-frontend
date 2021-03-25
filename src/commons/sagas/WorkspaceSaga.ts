@@ -674,7 +674,15 @@ export function* evalCode(
   const isNonDet: boolean = context.variant === 'non-det';
   const isLazy: boolean = context.variant === 'lazy';
   const isWasm: boolean = context.variant === 'wasm';
-  const { result, interrupted, paused } = yield race({
+  const {
+    result,
+    interrupted,
+    paused
+  }: {
+    result: Result;
+    interrupted: ReturnType<typeof actions.beginInterruptExecution>;
+    paused: ReturnType<typeof actions.beginDebuggerPause>;
+  } = yield race({
     result:
       actionType === DEBUG_RESUME
         ? call(resume, lastDebuggerResult)
@@ -746,6 +754,13 @@ export function* evalCode(
         actions.sendReplInputToOutput('Hints:\n' + parseError(typeErrors), workspaceLocation)
       );
     }
+
+    if (actionType === EVAL_EDITOR || actionType === EVAL_REPL) {
+      yield put(
+        notifyProgramEvaluated(result, lastDebuggerResult, code, context, workspaceLocation)
+      );
+    }
+
     return;
   } else if (result.status === 'suspended') {
     yield put(actions.endDebuggerPause(workspaceLocation));
