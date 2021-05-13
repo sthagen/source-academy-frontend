@@ -40,23 +40,16 @@ export const UPDATE_NOTIFICATIONS = 'UPDATE_NOTIFICATIONS';
 export const UPLOAD_KEYSTROKE_LOGS = 'UPLOAD_KEYSTROKE_LOGS';
 export const UPLOAD_UNSENT_LOGS = 'UPLOAD_UNSENT_LOGS';
 
-export type SessionState = {
+export type SessionStateBase = {
   readonly accessToken?: string;
   readonly assessmentOverviews?: AssessmentOverview[];
   readonly assessments: Map<number, Assessment>;
-  readonly grade: number;
   readonly gradingOverviews?: GradingOverview[];
   readonly gradings: Map<number, Grading>;
-  readonly group: string | null;
   readonly historyHelper: HistoryHelper;
   readonly maxGrade: number;
   readonly maxXp: number;
   readonly refreshToken?: string;
-  readonly role?: Role;
-  readonly story: Story;
-  readonly gameState: GameState;
-  readonly name?: string;
-  readonly userId?: number;
   readonly xp: number;
   readonly notifications: Notification[];
   readonly googleUser?: string;
@@ -65,9 +58,14 @@ export type SessionState = {
   readonly remoteExecutionSession?: DeviceSession;
 };
 
+
 export type Tokens = {
   accessToken: string;
   refreshToken: string;
+};
+
+type ReadonlyOptional<T> = {
+  readonly [P in keyof T]?: T[P];
 };
 
 export type User = {
@@ -78,4 +76,7 @@ export type User = {
   grade: number;
   story?: Story;
   gameState?: GameState;
+  profilePic: string;
 };
+
+export type SessionState = SessionStateBase & ReadonlyOptional<User>;

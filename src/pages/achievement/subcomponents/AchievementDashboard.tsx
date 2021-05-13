@@ -16,7 +16,7 @@ export type DispatchProps = {
 };
 
 export type StateProps = {
-  group: string | null;
+  group?: string | null;
   inferencer: AchievementInferencer;
   name?: string;
 };

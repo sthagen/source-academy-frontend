@@ -115,6 +115,7 @@ describe('Test FETCH_AUTH action', () => {
     userId: 123,
     name: 'user',
     role: 'student' as Role,
+    profilePic: '/profiles/123.png',
     group: '42D',
     story: {
       story: '',

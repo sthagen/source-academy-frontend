@@ -151,6 +151,7 @@ test('setUser generates correct action object', () => {
     userId: 123,
     name: 'test student',
     role: 'student' as Role,
+    profilePic: '/profiles/123.png',
     group: '42D',
     grade: 150,
     story: {} as Story,

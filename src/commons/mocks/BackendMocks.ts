@@ -41,6 +41,7 @@ export function* mockBackendSaga(): SagaIterator {
       userId: 123,
       name: 'DevStaff',
       role: 'staff' as Role,
+      profilePic: '/profiles/123.png',
       group: '1F',
       story: {
         story: 'mission-1',
