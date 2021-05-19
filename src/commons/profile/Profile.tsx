@@ -22,6 +22,7 @@ export type StateProps = {
   name?: string;
   role?: Role;
   assessmentOverviews?: AssessmentOverview[];
+  profilePic?: string;
 };
 
 type OwnProps = {
@@ -51,9 +52,16 @@ class Profile extends React.Component<ProfileProps, {}> {
 
       const userDetails = (
         <div className="profile-header">
+          <img className="profile-image" src={this.props.profilePic} alt="profile"></img>
           <div className="profile-username">
             <div className="name">{this.props.name}</div>
             <div className="role">{this.props.role}</div>
+            {/* <EditableText
+              multiline={true}
+              onChange={() => {}}
+              placeholder="Enter card background URL here"
+              value={this.props.name}
+            /> */}
           </div>
         </div>
       );

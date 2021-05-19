@@ -13,10 +13,14 @@ import { HotKeys } from 'react-hotkeys';
 import { useMergedRef } from '../utils/Hooks';
 import { keyBindings, KeyFunction } from './EditorHotkeys';
 import { AceMouseEvent, HighlightedLines, Position } from './EditorTypes';
+import GutterContextMenu, { ContextMenuHandler, ContextMenuItems } from './GutterContextMenu';
+
+import { ContextMenu as BPContextMenu } from '@blueprintjs/core';
 
 // =============== Hooks ===============
 // TODO: Should further refactor into EditorBase + different variants.
 // Ideally, hooks should be specified by the parent component instead.
+import useComments from './UseComments';
 import useHighlighting from './UseHighlighting';
 import useNavigation from './UseNavigation';
 import useRefactor from './UseRefactor';
@@ -25,11 +29,14 @@ import useTypeInference from './UseTypeInference';
 import { getModeString, selectMode } from '../utils/AceHelper';
 
 export type EditorKeyBindingHandlers = { [name in KeyFunction]?: () => void };
+export type ContextMenuHandlers = { [name in ContextMenuItems]?: ContextMenuHandler };
+
 export type EditorHook = (
   inProps: Readonly<EditorProps>,
   outProps: IAceEditorProps,
   keyBindings: EditorKeyBindingHandlers,
-  reactAceRef: React.MutableRefObject<AceEditor | null>
+  reactAceRef: React.MutableRefObject<AceEditor | null>,
+  contextMenuHandlers: ContextMenuHandlers
 ) => void;
 
 /**
@@ -112,17 +119,22 @@ const getMarkers = (
   }));
 };
 
-const makeHandleGutterClick = (
-  handleEditorUpdateBreakpoints: DispatchProps['handleEditorUpdateBreakpoints']
-) => (e: AceMouseEvent) => {
-  const target = e.domEvent.target! as HTMLDivElement;
+
+const toggleBreakpoint = (editor: Ace.Editor, row: number) => {
+  const content = editor.session.getLine(row);
+  const breakpoints = editor.session.getBreakpoints();
   if (
-    target.className.indexOf('ace_gutter-cell') === -1 ||
-    !e.editor.isFocused() ||
-    e.clientX > 35 + target.getBoundingClientRect().left
+    breakpoints[row] === undefined &&
+    content.length !== 0 &&
+    !content.includes('//') &&
+    !content.includes('debugger;')
   ) {
-    return;
+    editor.session.setBreakpoint(row, undefined!);
+  } else {
+    editor.session.clearBreakpoint(row);
   }
+
+  /*
 
   // Breakpoint related.
   const row = e.getDocumentPosition().row;
@@ -138,9 +150,46 @@ const makeHandleGutterClick = (
   } else {
     e.editor.session.clearBreakpoint(row);
   }
+
+  */
+};
+
+
+
+const isNotGutterClick = (e: React.MouseEvent | MouseEvent) => {
+  const target = e.target! as HTMLDivElement;
+  return (
+    target.className.indexOf('ace_gutter-cell') === -1 || // This guarantees that this is an ace-gutter-cell
+    e.clientX > 35 + target.getBoundingClientRect().left
+  );
+};
+
+const getRowFromAceGutterElement = (elem: HTMLDivElement) => {
+  // ACE Editor's getDocumentPosition is bugged once items are put into it.
+  // The bug is somewhere in either https://github.com/ajaxorg/ace/blob/ba2fd5f25b5ca435b68cee08f6b14965fda62629/lib/ace/virtual_renderer.js#L1483
+  // or https://github.com/ajaxorg/ace/blob/ddb417e61b7056d225b35f7f2469d3eff03b8ec0/lib/ace/edit_session.js#L2116
+  // It will take too long to fix properly.
+  return parseInt(elem.textContent!, 10) - 1; // Please NEVER DISABLE LINE NUMBERS.
+};
+
+const makeHandleGutterClick = (
+  handleEditorUpdateBreakpoints: DispatchProps['handleEditorUpdateBreakpoints']
+) => (e: AceMouseEvent) => {
+  if (isNotGutterClick(e.domEvent) || !e.editor.isFocused()) {
+    return;
+  }
+  // Breakpoint related.
+  // const row = e.getDocumentPosition().row;
+  const target = e.domEvent.target! as HTMLDivElement;
+  const row = getRowFromAceGutterElement(target);
+
+  toggleBreakpoint(e.editor, row);
+
   e.stop();
   handleEditorUpdateBreakpoints(e.editor.session.getBreakpoints());
 };
+
+
 
 // Note: This is untestable/unused because JS-hint has been removed.
 const makeHandleAnnotationChange = (session: Ace.EditSession) => () => {
@@ -204,6 +253,28 @@ const EditorBase = React.memo(
       handlePromptAutocompleteRef.current = props.handlePromptAutocomplete;
     }, [props.handleEditorUpdateBreakpoints, props.handlePromptAutocomplete]);
 
+    // Handlers
+    const {
+      handleUpdateHasUnsavedChanges,
+      handleEditorValueChange,
+      isEditorAutorun,
+      handleEditorEval
+    } = props;
+
+    const keyHandlers: EditorKeyBindingHandlers = {
+      evaluate: handleEditorEval
+    };
+
+
+    const contextMenuHandlers: ContextMenuHandlers = React.useMemo(() => ({
+      toggleBreakpoint: (row: number) => {
+        if (!reactAceRef.current) {
+          return;
+        }
+        toggleBreakpoint(reactAceRef.current?.editor, row);
+      },
+    }), [reactAceRef]);
+
     // Handles input into AceEditor causing app to scroll to the top on iOS Safari
     React.useEffect(() => {
       const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
@@ -234,6 +305,11 @@ const EditorBase = React.memo(
     // unconditionally.
     selectMode(sourceChapter, sourceVariant, externalLibraryName);
 
+
+    // This needs to be defined later, unfortunately.
+    // Too tedious to rearrange the code otherwise.
+    const showContextMenuRef = React.useRef((e: MouseEvent) => {});
+
     React.useLayoutEffect(() => {
       if (!reactAceRef.current) {
         return;
@@ -249,6 +325,10 @@ const EditorBase = React.memo(
         'gutterclick' as any,
         makeHandleGutterClick((...args) => handleEditorUpdateBreakpointsRef.current(...args)) as any
       );
+
+      const gutter = (editor.renderer as any).$gutter as HTMLElement;
+      gutter.addEventListener('contextmenu', showContextMenuRef.current);
+      document.addEventListener('click', () => BPContextMenu.hide());
 
       // Change all info annotations to error annotations
       session.on('changeAnnotation' as any, makeHandleAnnotationChange(session));
@@ -270,15 +350,7 @@ const EditorBase = React.memo(
       }
     }, [props.newCursorPosition]);
 
-    const {
-      handleUpdateHasUnsavedChanges,
-      handleEditorValueChange,
-      isEditorAutorun,
-      handleEditorEval
-    } = props;
-    const keyHandlers: EditorKeyBindingHandlers = {
-      evaluate: handleEditorEval
-    };
+    
 
     const aceEditorProps: IAceEditorProps = {
       className: 'react-ace',
@@ -307,7 +379,7 @@ const EditorBase = React.memo(
       // Note: the following is extremely non-standard use of hooks
       // DO NOT refactor this into any form where the hook is called from a lambda
       for (const hook of hooks) {
-        hook(props, aceEditorProps, keyHandlers, reactAceRef);
+        hook(props, aceEditorProps, keyHandlers, reactAceRef, contextMenuHandlers);
       }
     }
 
@@ -336,6 +408,41 @@ const EditorBase = React.memo(
         handleEditorEval
       ]
     );
+
+     // ----------------- BIND CONTEXT MENU ----------------
+
+    // const [isContextMenuOpen, setContextMenuOpen] = React.useState(false);
+
+    const showContextMenu = React.useCallback(
+      (e: MouseEvent) => {
+        console.log("showContextMenu");
+        const editor = reactAceRef.current!.editor;
+        if (isNotGutterClick(e) /*|| !editor.isFocused()*/) {
+          console.log(isNotGutterClick(e));
+          console.log(!editor.isFocused());
+          return;
+        }
+        const target = e.target! as HTMLDivElement;
+        const row = getRowFromAceGutterElement(target);
+
+        e.preventDefault();
+        BPContextMenu.show(
+          <GutterContextMenu row={row} handlers={contextMenuHandlers} />,
+          { left: e.clientX, top: e.clientY },
+          () => {
+            // setContextMenuOpen(false);
+          }
+        );
+        // indicate that context menu is open so we can add a CSS class to this element
+        // setContextMenuOpen(true);
+      },
+      [contextMenuHandlers]
+    );
+
+    // This needs to be used earlier, otherwise this shd be made a const.
+    showContextMenuRef.current = showContextMenu;
+
+    // ----------------- BIND HOTKEYS ----------------
 
     aceEditorProps.commands = Object.entries(keyHandlers)
       .filter(([_, exec]) => exec)
@@ -379,7 +486,7 @@ const EditorBase = React.memo(
 );
 
 // don't create a new list every render.
-const hooks = [useHighlighting, useNavigation, useTypeInference, useShareAce, useRefactor];
+const hooks = [useHighlighting, useNavigation, useTypeInference, useShareAce, useRefactor, useComments];
 
 const Editor = React.forwardRef<AceEditor, EditorProps>((props, ref) => (
   <EditorBase {...props} hooks={hooks} ref={ref} />

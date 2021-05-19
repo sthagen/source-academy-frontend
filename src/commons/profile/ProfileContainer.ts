@@ -8,7 +8,8 @@ import Profile, { DispatchProps, StateProps } from './Profile';
 const mapStateToProps: MapStateToProps<StateProps, {}, OverallState> = state => ({
   assessmentOverviews: state.session.assessmentOverviews,
   name: state.session.name,
-  role: state.session.role
+  role: state.session.role,
+  profilePic: state.session.profilePic
 });
 
 const mapDispatchToProps: MapDispatchToProps<DispatchProps, {}> = (dispatch: Dispatch) =>
