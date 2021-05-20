@@ -33,13 +33,15 @@ const useCommentsEditorHook: EditorHook = (
     reactAceRef,
     contextMenuHandlers
 ) => {
-    const commentsAPI = useComments();
+    //@ts-ignore
+    const [ignored, forceUpdate] = React.useReducer(x => x + 1, 0);
+    const commentsAPI = useComments(forceUpdate);
     const commentsAPIRef: React.MutableRefObject<CommentAPI> = React.useRef(commentsAPI);
     React.useEffect(() => {
         commentsAPIRef.current = commentsAPI;
     }, [commentsAPI]);
     // ----------------- ACE-EDITOR CONFIG -----------------
-    // Enables the line maanger, which is used to put inline comments.
+    // Enables the line manager, which is used to put inline comments.
 
     const widgetManagerRef: React.MutableRefObject<ILineManager | null> = React.useRef(null);
     React.useEffect(() => {
@@ -59,7 +61,8 @@ const useCommentsEditorHook: EditorHook = (
 
     // Render comments.
     React.useEffect(() => {
-        const { comments } = commentsAPI;
+        console.log('re-render comments')
+        const comments = commentsAPI.commentsRef.current;
 
         // React can't handle the rendering because it's going into
         // an unmanaged component.
@@ -116,7 +119,7 @@ const useCommentsEditorHook: EditorHook = (
                 widgetManagerRef.current?.removeLineWidget(widget);
             });
         };
-    }, [commentsAPI]);
+    }, [commentsAPI, commentsAPI.commentsRef]);
 };
 
 export default useCommentsEditorHook;

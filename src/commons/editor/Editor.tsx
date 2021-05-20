@@ -474,7 +474,7 @@ const EditorBase = React.memo(
         /* eslint-enable */
       }
     });
-
+    console.log("re-render editor");
     return (
       <HotKeys className="Editor" handlers={handlers}>
         <div className="row editor-react-ace">
