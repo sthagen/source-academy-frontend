@@ -33,6 +33,7 @@ const useCommentsEditorHook: EditorHook = (
     reactAceRef,
     contextMenuHandlers
 ) => {
+    const containerRef = React.useRef<any>([]);
     //@ts-ignore
     const [ignored, forceUpdate] = React.useReducer(x => x + 1, 0);
     const commentsAPI = useComments(forceUpdate);
@@ -71,13 +72,16 @@ const useCommentsEditorHook: EditorHook = (
 
         // Re-render all comments.
         const commentsByLine = groupBy(values(comments), c => c.linenum);
-        const commentsWidgets = map(commentsByLine, commentsOnLineUnsorted => {
+        // const commentsWidgets =
+        map(commentsByLine, commentsOnLineUnsorted => {
             //@ts-ignore
             const lineNo = commentsOnLineUnsorted[0].linenum;
             const commentsOnLine = sortBy(commentsOnLineUnsorted, c => c.datetime);
-            const container = document.createElement('div');
+            //@ts-ignore
+            let container = containerRef.current[lineNo];
+            if (!container) {
+                container = containerRef.current[lineNo] = document.createElement("div");
             container.style.maxWidth = '40em';
-            // container.style.backgroundColor = 'grey';
             const widget: IWidget = {
                 row: commentsOnLine[0].linenum, // Must exist.
                 fixedWidth: true,
@@ -85,6 +89,10 @@ const useCommentsEditorHook: EditorHook = (
                 el: container,
                 type: 'errorMarker'
             };
+                // need to add once per widget
+                widgetManagerRef.current?.addLineWidget(widget);
+            }
+            // container.style.backgroundColor = 'grey'
             // console.log("rerendering", lineNo);
             // setInterval(() => 
             // ReactDOM.render(
@@ -109,16 +117,15 @@ const useCommentsEditorHook: EditorHook = (
                 </div>,
                 container
             );
-            widgetManagerRef.current?.addLineWidget(widget);
-            return widget;
+            // return widget;
         });
 
-        return () => {
+        /* return () => {
             // Remove all comments
             commentsWidgets.forEach(widget => {
                 widgetManagerRef.current?.removeLineWidget(widget);
             });
-        };
+        }; */
     }, [commentsAPI, commentsAPI.commentsRef]);
 };
 

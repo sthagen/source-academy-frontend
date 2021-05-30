@@ -91,6 +91,109 @@ import { some } from 'lodash';
   */
   
 
+    //@ts-ignore
+    function CollapsedComment(props: { comment: IComment, expandComment: (IComment) => void }) {
+      const { comment, expandComment } = props;
+      return (
+        <div
+          onClick={() => expandComment(comment)}
+          style={{
+            backgroundColor: 'rgb(37, 53, 69)',
+            paddingTop: '0.5em',
+            gridColumn: '2'
+          }}
+        >
+          <Divider style={{ borderColor: 'rgba(144, 144, 144, 0.4)' }}></Divider>
+        </div>
+      );
+    }
+
+    //@ts-ignore
+
+    function CommentCard(props: { comment: IComment, editComment: (IComment) => ((any) => void), collapseComment: (IComment) => void,
+      isUnsubmittedComment: (c: IComment) => boolean, updatePreviewCommentText: (comment: IComment) => ((e: any) => void),
+      cancelWithPrompt: (c: IComment) => ((e: any) => void) }) {
+      const { comment, editComment, collapseComment, isUnsubmittedComment, updatePreviewCommentText, cancelWithPrompt } = props;
+      const error = /*errorMsgs[id] || */'';
+      // const isLoading = loadingStatus[id] || false;
+      // Override the comment with the temp edited version.
+      const displayComment = comment.meta.editing ? comment.meta.editing : comment;
+      const { profilePic, username, text, datetime } = displayComment;
+      const isEditing: boolean = comment.meta.editing !== undefined;
+
+      return (
+        <Card className="comment" style={commentStyles}>
+          <img className="profile-pic" src={profilePic} alt="" style={profilePicStyles}></img>
+          <div className="content" style={contentStyles}>
+            {
+              /* Popover bp-layout="float-right" isn't working */
+              !isEditing ? (
+                <div style={optionStyles}>
+                  <Popover
+                    content={
+                      <Menu>
+                        <MenuItem text="Edit" onClick={editComment(comment)}></MenuItem>
+                        {/* <MenuItem text="Delete" onClick={deleteComment(comment)}></MenuItem> */}
+                      </Menu>
+                    }
+                    position={Position.RIGHT_TOP}
+                  >
+                    <Icon icon="more"></Icon>
+                  </Popover>
+                </div>
+              ) : (
+                ''
+              )
+            }
+            <div style={optionStyles}>
+              <Icon icon="small-minus" onClick={() => collapseComment(comment)}></Icon>
+            </div>
+            <span className="username" style={usernameStyles}>
+              {username}{' '}
+            </span>
+            <span className="relative-time" style={relativeTimeStyles}>
+              {isUnsubmittedComment(comment) ? 'Preview' : format(new Date(datetime))}
+            </span>
+            <Markdown className="text" content={text || '(Content preview)'} />
+            <div className="error-text" style={errorTextStyles}>
+              {error}
+            </div>
+          </div>
+          {isEditing ? (
+            <div className="reply-container" style={replyContainerStyles}>
+              <textarea
+                style={enterMessageStyles}
+                placeholder="Write a message..."
+                onChange={updatePreviewCommentText(displayComment)}
+                defaultValue={text}
+              ></textarea>
+              <ButtonGroup>
+                <Button onClick={cancelWithPrompt(displayComment)}>Cancel</Button>
+                <Button
+                  intent="success"
+                  // onClick={confirmSubmit(displayComment)}
+                  // disabled={text.trim().length === 0 || isLoading}
+                >
+                  Submit
+                </Button>
+                {
+                  // Technically not part of button group, by why not?
+/*                   isLoading ? (
+                    <div style={{ paddingTop: '0.3em', paddingLeft: '1em' }}>
+                      <Spinner size={Spinner.SIZE_SMALL}></Spinner>
+                    </div>
+                  ) : (
+                    ''
+                  )*/
+                }
+              </ButtonGroup>
+            </div>
+          ) : (
+            ''
+          )}
+        </Card>
+      );
+    }
   
   export default function Comments(props: CommentsProps) {
     const { comments, commentsAPIRef } = props;
@@ -207,108 +310,6 @@ import { some } from 'lodash';
     // ----------------- RENDERING -----------------
     const isCollapsed = some(comments, c => c.meta.isCollapsed);
 
-    //@ts-ignore
-    function CollapsedComment(props: { comment: IComment }) {
-      const { comment } = props;
-      return (
-        <div
-          onClick={() => expandComment(comment)}
-          style={{
-            backgroundColor: 'rgb(37, 53, 69)',
-            paddingTop: '0.5em',
-            gridColumn: '2'
-          }}
-        >
-          <Divider style={{ borderColor: 'rgba(144, 144, 144, 0.4)' }}></Divider>
-        </div>
-      );
-    }
-
-    //@ts-ignore
-
-    function CommentCard(props: { comment: IComment }) {
-      const { comment } = props;
-      const error = /*errorMsgs[id] || */'';
-      // const isLoading = loadingStatus[id] || false;
-      // Override the comment with the temp edited version.
-      const displayComment = comment.meta.editing ? comment.meta.editing : comment;
-      const { profilePic, username, text, datetime } = displayComment;
-      const isEditing: boolean = comment.meta.editing !== undefined;
-
-      return (
-        <Card className="comment" style={commentStyles}>
-          <img className="profile-pic" src={profilePic} alt="" style={profilePicStyles}></img>
-          <div className="content" style={contentStyles}>
-            {
-              /* Popover bp-layout="float-right" isn't working */
-              !isEditing ? (
-                <div style={optionStyles}>
-                  <Popover
-                    content={
-                      <Menu>
-                        <MenuItem text="Edit" onClick={editComment(comment)}></MenuItem>
-                        {/* <MenuItem text="Delete" onClick={deleteComment(comment)}></MenuItem> */}
-                      </Menu>
-                    }
-                    position={Position.RIGHT_TOP}
-                  >
-                    <Icon icon="more"></Icon>
-                  </Popover>
-                </div>
-              ) : (
-                ''
-              )
-            }
-            <div style={optionStyles}>
-              <Icon icon="small-minus" onClick={() => collapseComment(comment)}></Icon>
-            </div>
-            <span className="username" style={usernameStyles}>
-              {username}{' '}
-            </span>
-            <span className="relative-time" style={relativeTimeStyles}>
-              {isUnsubmittedComment(comment) ? 'Preview' : format(new Date(datetime))}
-            </span>
-            <Markdown className="text" content={text || '(Content preview)'} />
-            <div className="error-text" style={errorTextStyles}>
-              {error}
-            </div>
-          </div>
-          {isEditing ? (
-            <div className="reply-container" style={replyContainerStyles}>
-              <textarea
-                style={enterMessageStyles}
-                placeholder="Write a message..."
-                onChange={updatePreviewCommentText(displayComment)}
-                defaultValue={text}
-              ></textarea>
-              <ButtonGroup>
-                <Button onClick={cancelWithPrompt(displayComment)}>Cancel</Button>
-                <Button
-                  intent="success"
-                  // onClick={confirmSubmit(displayComment)}
-                  // disabled={text.trim().length === 0 || isLoading}
-                >
-                  Submit
-                </Button>
-                {
-                  // Technically not part of button group, by why not?
-/*                   isLoading ? (
-                    <div style={{ paddingTop: '0.3em', paddingLeft: '1em' }}>
-                      <Spinner size={Spinner.SIZE_SMALL}></Spinner>
-                    </div>
-                  ) : (
-                    ''
-                  )*/
-                }
-              </ButtonGroup>
-            </div>
-          ) : (
-            ''
-          )}
-        </Card>
-      );
-    }
-
     return (
       <div className="comments-container" 
         style={commentsContainerStyles}>
@@ -323,10 +324,18 @@ import { some } from 'lodash';
           const { id } = comment;
           const { isCollapsed } = comment.meta;
           if (isCollapsed) {
-            return (<CollapsedComment comment={comment} key={id}/>)
+            return (<CollapsedComment comment={comment} key={id} expandComment={expandComment} />)
           }
           return (
-            <CommentCard comment={comment} key={id}/>
+            <CommentCard
+              comment={comment}
+              key={id}
+              editComment={editComment}
+              collapseComment={collapseComment}
+              isUnsubmittedComment={isUnsubmittedComment}
+              updatePreviewCommentText={updatePreviewCommentText}
+              cancelWithPrompt={cancelWithPrompt}
+            />
           );
         })}
       </div>
