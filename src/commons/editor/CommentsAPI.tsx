@@ -26,7 +26,7 @@ export interface ICommentMeta {
 
 
 export interface CommentAPI {
-    commentsRef: React.MutableRefObject<{ [id: string]: IComment }>,
+    comments: { [id: string]: IComment },
     loadComments: (assessmentId: string) => Promise<{ [id: string]: IComment }>,
     createEmptyComment: (row: number) => void;
     updateComment: (...comments: IComment[]) => void;
@@ -80,12 +80,7 @@ interface StateProps {
 
 // This is because this is a self-contained abstraction which is meant to be loaded into components.
 export function useComments(forceUpdate: () => void): CommentAPI {
-    const commentsRef = React.useRef({} as { [id: string]: IComment });
-    const setComments = React.useCallback((commentsNew:  { [id: string]: IComment }) => {
-        commentsRef.current = commentsNew;
-        console.log('setComments', commentsNew);
-        forceUpdate();
-    },[forceUpdate]);
+    const [comments, setComments] = React.useState({} as { [id: string]: IComment });
 
     // const [comments, setComments] = React.useState({} as { [id: string]: IComment });
     const { name, userId, profilePic } = useSelector<OverallState,StateProps>(state => ({
@@ -98,11 +93,11 @@ export function useComments(forceUpdate: () => void): CommentAPI {
         (...updatedComments: IComment[]) => {
             const updatedCommentsById = keyBy(updatedComments, 'id');
             setComments({
-                ...(commentsRef.current),
+                ...(comments),
                 ...updatedCommentsById
             });
         },
-        [setComments]
+        [comments]
     );
 
     // STUB FUNCTION
@@ -111,13 +106,13 @@ export function useComments(forceUpdate: () => void): CommentAPI {
             (assessmentId: string) =>
                 new Promise((resolve, reject) => {
                     if (Math.random() < 0.5) {
-                        setTimeout(() => resolve(commentsRef.current), 1000);
+                        setTimeout(() => resolve(comments), 1000);
                     } else {
                         setTimeout(() => reject('(Test error message) Some error occured, please try again'), 1000);
                     }
                 })
 
-            , [commentsRef]);
+            , [comments]);
 
     // TODO: update details accordingly.
     const createEmptyComment = React.useCallback(
@@ -139,11 +134,11 @@ export function useComments(forceUpdate: () => void): CommentAPI {
             };
             newComment.meta.editing = newComment; // set to editing by default
             setComments({
-                ...(commentsRef.current),
+                ...(comments),
                 [id]: newComment
             });
         },
-        [name, profilePic, setComments, userId]
+        [comments, name, profilePic, userId]
     );
 
     // Need a way to update the edit transparently.
@@ -152,7 +147,7 @@ export function useComments(forceUpdate: () => void): CommentAPI {
     const updateComment = React.useCallback(
         (...newComments: IComment[]) => {
             updateCommentRaw(...(newComments.map(comment => {
-                const original = (commentsRef.current)[comment.id];
+                const original = (comments)[comment.id];
 
                 if (!original.meta.editing) {
                     return comment;
@@ -167,16 +162,16 @@ export function useComments(forceUpdate: () => void): CommentAPI {
                 }
 
             })))
-        }, [commentsRef, updateCommentRaw]
+        }, [comments, updateCommentRaw]
     );
 
     const removeComment = React.useCallback(
         (...commentsToRemove: IComment[]) => {
             const ids = commentsToRemove.map(c => c.id);
-            setComments(omit(commentsRef.current, ids));
+            setComments(omit(comments, ids));
             // Also remove from being edited.
         },
-        [setComments]
+        [comments]
     );
 
     const setEdit = React.useCallback(
@@ -248,7 +243,7 @@ export function useComments(forceUpdate: () => void): CommentAPI {
 
 
     return {
-        commentsRef,
+        comments,
         loadComments,
         updateComment,
         removeComment,
