@@ -22,7 +22,8 @@ import { some } from 'lodash';
   
   export interface CommentsProps {
     comments: IComment[]; // Subset of comments on this widget only!
-    commentsAPIRef: React.MutableRefObject<CommentAPI>;
+    // commentsAPIRef: React.MutableRefObject<CommentAPI>;
+    commentsAPI: CommentAPI;
   }
   
   // =============== STYLES ===============
@@ -112,8 +113,8 @@ import { some } from 'lodash';
 
     function CommentCard(props: { comment: IComment, editComment: (IComment) => ((any) => void), collapseComment: (IComment) => void,
       isUnsubmittedComment: (c: IComment) => boolean, updatePreviewCommentText: (comment: IComment) => ((e: any) => void),
-      cancelWithPrompt: (c: IComment) => ((e: any) => void) }) {
-      const { comment, editComment, collapseComment, isUnsubmittedComment, updatePreviewCommentText, cancelWithPrompt } = props;
+      cancelWithPrompt: (c: IComment) => ((e: any) => void), confirmSubmit: (c: IComment) => ((e: any) => void) }) {
+      const { comment, editComment, collapseComment, isUnsubmittedComment, updatePreviewCommentText, cancelWithPrompt, confirmSubmit } = props;
       const error = /*errorMsgs[id] || */'';
       // const isLoading = loadingStatus[id] || false;
       // Override the comment with the temp edited version.
@@ -171,7 +172,7 @@ import { some } from 'lodash';
                 <Button onClick={cancelWithPrompt(displayComment)}>Cancel</Button>
                 <Button
                   intent="success"
-                  // onClick={confirmSubmit(displayComment)}
+                  onClick={confirmSubmit(comment)}
                   // disabled={text.trim().length === 0 || isLoading}
                 >
                   Submit
@@ -196,8 +197,7 @@ import { some } from 'lodash';
     }
   
   export default function Comments(props: CommentsProps) {
-    const { comments, commentsAPIRef } = props;
-    const commentsAPI = commentsAPIRef.current;
+    const { comments, commentsAPI } = props;
     // Errors are local.
     // TODO: move errors into CommentsAPI.
     // const [errorMsgs, setErrorMsgs] = React.useState({} as { [id: string]: string });
@@ -209,6 +209,7 @@ import { some } from 'lodash';
       removeComment,
       isUnsubmittedComment,
       setEdit,
+      mergeEdit,
       cancelEdit,
       collapseComment,
       expandComment
@@ -246,36 +247,38 @@ import { some } from 'lodash';
       };
     }
   
-    /*function confirmSubmit(comment: IComment) {
+    function confirmSubmit(comment: IComment) {
       return async function (evt: any) {
         // TODO: figure out a method for edits
-        const newComment: IComment = {
-          ...comment,
-          datetime: Date.now()
-        };
+        // const newComment: IComment = {
+        //   ...comment,
+        //   datetime: Date.now()
+        // };
   
-        // This is to give a spinner to the users.
-        setLoadingStatus({
-          ...loadingStatus,
-          [comment.id]: true
-        });
+        // // This is to give a spinner to the users.
+        // setLoadingStatus({
+        //   ...loadingStatus,
+        //   [comment.id]: true
+        // });
   
-        try {
-          await sendToServer(newComment); // TODO: STUB FUNCTION, PLEASE UPDATE.
-          updateComment(newComment);
-          removeCommentEdit(newComment);
-          setErrorMsgs(omit(errorMsgs, [comment.id]));
-        } catch (e) {
-          setErrorMsgs({
-            ...errorMsgsRef.current,
-            [comment.id]: e
-          });
-        } finally {
-          // Pop quiz: why do we need to ref.current?
-          setLoadingStatus(omit(loadingStatusRef.current, [comment.id]));
-        }
+        // try {
+        //   await sendToServer(newComment); // TODO: STUB FUNCTION, PLEASE UPDATE.
+        //   updateComment(newComment);
+        //   removeCommentEdit(newComment);
+        //   setErrorMsgs(omit(errorMsgs, [comment.id]));
+        // } catch (e) {
+        //   setErrorMsgs({
+        //     ...errorMsgsRef.current,
+        //     [comment.id]: e
+        //   });
+        // } finally {
+        //   // Pop quiz: why do we need to ref.current?
+        //   setLoadingStatus(omit(loadingStatusRef.current, [comment.id]));
+        // }
+          console.log('merge edit', comment);
+          mergeEdit(comment);
       };
-    }*/
+    }
   
     function editComment(comment: IComment) {
       return function (evt: any) {
@@ -335,6 +338,7 @@ import { some } from 'lodash';
               isUnsubmittedComment={isUnsubmittedComment}
               updatePreviewCommentText={updatePreviewCommentText}
               cancelWithPrompt={cancelWithPrompt}
+              confirmSubmit={confirmSubmit}
             />
           );
         })}

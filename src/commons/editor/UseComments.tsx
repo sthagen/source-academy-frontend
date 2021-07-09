@@ -1,11 +1,11 @@
 import { Ace, require as acequire } from 'ace-builds';
-import { groupBy, map, sortBy, values } from 'lodash';
+import { each, groupBy, sortBy, values } from 'lodash';
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 
 //@ts-ignore
 import Comments from './Comments';
-import { CommentAPI, useComments } from './CommentsAPI'
+import { useComments } from './CommentsAPI'
 import { EditorHook } from './Editor';
 const LineWidgets = acequire('ace/line_widgets').LineWidgets;
 
@@ -24,6 +24,7 @@ interface ILineManager {
     attach: (editor: Ace.Editor) => void;
     addLineWidget: (widget: IWidget) => void;
     removeLineWidget: (widget: IWidget) => void;
+    onWidgetChanged: (widget: IWidget) => void; // Call to update the widget's size.
 }
 
 const useCommentsEditorHook: EditorHook = (
@@ -34,13 +35,7 @@ const useCommentsEditorHook: EditorHook = (
     contextMenuHandlers
 ) => {
     const lineWidgetsRef = React.useRef<{[lineNo: number]: IWidget}>([]);
-    //@ts-ignore
-    const [ignored, forceUpdate] = React.useReducer(x => x + 1, 0);
-    const commentsAPI = useComments(forceUpdate);
-    const commentsAPIRef: React.MutableRefObject<CommentAPI> = React.useRef(commentsAPI);
-    React.useEffect(() => {
-        commentsAPIRef.current = commentsAPI;
-    }, [commentsAPI]);
+    const commentsAPI = useComments();
     // ----------------- ACE-EDITOR CONFIG -----------------
     // Enables the line manager, which is used to put inline comments.
 
@@ -61,16 +56,18 @@ const useCommentsEditorHook: EditorHook = (
     // ----------------- RENDERING -----------------
 
     // Render comments.
+    // React can't handle the rendering because it's going into
+    // an unmanaged component.
     React.useEffect(() => {
-        console.log('re-render comments')
+        console.log('re-render comments');
         const comments = commentsAPI.comments;
+        const widgetManager = widgetManagerRef.current!;
 
-        // React can't handle the rendering because it's going into
-        // an unmanaged component.
+
+        
         // Also, the line number changes externally, so extra fun.
-        // TODO: implement line number changes for comments. <--- going to skip this. 
+        // TODO: implement line number changes for comments. <--- going to skip this. Only use on static line numbers.
 
-        // Re-render all comments.
         const commentsByLine = groupBy(values(comments), c => c.linenum);
 
         // Remove all containers which do not have a line.
@@ -84,8 +81,7 @@ const useCommentsEditorHook: EditorHook = (
         // Do this by adding and removing the container.
         // This cannot be done without losing focus, so it cannot be applied arbitrarily.
 
-        // const commentsWidgets =
-        map(commentsByLine, commentsOnLineUnsorted => {
+        each(commentsByLine, commentsOnLineUnsorted => {
             const lineNo = commentsOnLineUnsorted[0].linenum;
             const commentsOnLine = sortBy(commentsOnLineUnsorted, c => c.datetime);
             let widget: IWidget = lineWidgetsRef.current[lineNo];
@@ -99,18 +95,21 @@ const useCommentsEditorHook: EditorHook = (
                     el: container,
                     type: 'errorMarker'
                 };
-                widgetManagerRef.current?.addLineWidget(widget);
+                widgetManager.addLineWidget(widget);
             }
             const container = widget.el;
             ReactDOM.render(
                 <Comments key={lineNo}
                     comments={commentsOnLine}
-                    commentsAPIRef={commentsAPIRef}
-                    // commentsAPI={commentsAPI}
+                    // commentsAPIRef={commentsAPIRef}
+                    commentsAPI={commentsAPI}
                 />,
                 container
             );
+            widgetManager.onWidgetChanged(widget);
+            // widgetManager.session._emit("changeFold", { data: { start: { row:widget.row }}});
         });
+        // widgetManagerRef.current?.$renderWidgets(null, editor.renderer);
     }, [commentsAPI]);
 };
 

@@ -79,7 +79,7 @@ interface StateProps {
 }
 
 // This is because this is a self-contained abstraction which is meant to be loaded into components.
-export function useComments(forceUpdate: () => void): CommentAPI {
+export function useComments(): CommentAPI {
     const [comments, setComments] = React.useState({} as { [id: string]: IComment });
 
     // const [comments, setComments] = React.useState({} as { [id: string]: IComment });
