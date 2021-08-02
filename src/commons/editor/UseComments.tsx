@@ -1,15 +1,23 @@
 import { Ace, require as acequire } from 'ace-builds';
-import { each, groupBy, sortBy, values } from 'lodash';
+import { each, sortBy } from 'lodash';
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 
-//@ts-ignore
 import Comments from './Comments';
 import { useComments } from './CommentsAPI'
 import { EditorHook } from './Editor';
 const LineWidgets = acequire('ace/line_widgets').LineWidgets;
 
 export type { IComment, CommentAPI } from './CommentsAPI';
+
+export interface CommentsStateProps {
+  // Provide either assessmentId XOR SubmissionId + question number, or none of them.
+  // Too complicated to make into union type.
+  assessmentId?: number;
+  submissionId?: number;
+  questionId?: number;
+  disableComments?: boolean;
+}
 
 // Inferred from: https://github.com/ajaxorg/ace/blob/master/lib/ace/ext/error_marker.js#L129
 interface IWidget {
@@ -35,7 +43,7 @@ const useCommentsEditorHook: EditorHook = (
     contextMenuHandlers
 ) => {
     const lineWidgetsRef = React.useRef<{[lineNo: number]: IWidget}>([]);
-    const commentsAPI = useComments();
+    const commentsAPI = useComments(inProps);
     // ----------------- ACE-EDITOR CONFIG -----------------
     // Enables the line manager, which is used to put inline comments.
 
@@ -59,31 +67,27 @@ const useCommentsEditorHook: EditorHook = (
     // React can't handle the rendering because it's going into
     // an unmanaged component.
     React.useEffect(() => {
-        console.log('re-render comments');
         const comments = commentsAPI.comments;
         const widgetManager = widgetManagerRef.current!;
-
-
         
         // Also, the line number changes externally, so extra fun.
         // TODO: implement line number changes for comments. <--- going to skip this. Only use on static line numbers.
-
-        const commentsByLine = groupBy(values(comments), c => c.linenum);
-
         // Remove all containers which do not have a line.
         for(const [currLine, widget] of Object.entries(lineWidgetsRef.current)) {
-            if(!(currLine in commentsByLine)) {
+            if(!(currLine in comments)) {
                 widgetManagerRef.current?.removeLineWidget(widget);
                 delete lineWidgetsRef.current[currLine];
             }
         }
-        // TODO: resize all containers that have been minimized.
-        // Do this by adding and removing the container.
-        // This cannot be done without losing focus, so it cannot be applied arbitrarily.
 
-        each(commentsByLine, commentsOnLineUnsorted => {
+        each(comments, (commentsOnLineUnsorted, idx) => {
             const lineNo = commentsOnLineUnsorted[0].linenum;
+            if(lineNo === -1) { // Do not render the side-panel comments
+                return;
+            }
             const commentsOnLine = sortBy(commentsOnLineUnsorted, c => c.datetime);
+            // The ref is required to prevent re-creating the container.
+            // If the container is re-created, the focus will be lost.
             let widget: IWidget = lineWidgetsRef.current[lineNo];
             if(!widget) {
                 const container = document.createElement("div");
@@ -101,15 +105,12 @@ const useCommentsEditorHook: EditorHook = (
             ReactDOM.render(
                 <Comments key={lineNo}
                     comments={commentsOnLine}
-                    // commentsAPIRef={commentsAPIRef}
                     commentsAPI={commentsAPI}
                 />,
                 container
             );
             widgetManager.onWidgetChanged(widget);
-            // widgetManager.session._emit("changeFold", { data: { start: { row:widget.row }}});
         });
-        // widgetManagerRef.current?.$renderWidgets(null, editor.renderer);
     }, [commentsAPI]);
 };
 

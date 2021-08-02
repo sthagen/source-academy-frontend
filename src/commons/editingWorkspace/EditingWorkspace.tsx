@@ -182,7 +182,9 @@ class EditingWorkspace extends React.Component<EditingWorkspaceProps, State> {
               handleEditorUpdateBreakpoints: this.props.handleEditorUpdateBreakpoints,
               handleUpdateHasUnsavedChanges: this.props.handleUpdateHasUnsavedChanges,
               handlePromptAutocomplete: this.props.handlePromptAutocomplete,
-              isEditorAutorun: false
+              isEditorAutorun: false,
+              assessmentId: this.state.assessment.id,
+              questionId
             }
           : undefined,
       editorHeight: this.props.editorHeight,

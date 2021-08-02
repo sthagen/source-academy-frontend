@@ -1,3 +1,5 @@
+import {  IComments } from 'src/commons/editor/EditorTypes';
+
 import {
   AssessmentCategory,
   AutogradingResult,
@@ -56,12 +58,12 @@ export type GradingQuestion = {
     name: string;
     id: number;
   };
+  comments?: IComments;
   grade: {
     grade: number;
     gradeAdjustment: number;
     xp: number;
     xpAdjustment: number;
-    comments?: string;
     grader?: {
       name: string;
       id: number;

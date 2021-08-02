@@ -772,7 +772,10 @@ const AssessmentWorkspace: React.FC<AssessmentWorkspaceProps> = props => {
           isEditorAutorun: false,
           onChange: onChangeMethod,
           onCursorChange: onCursorChangeMethod,
-          onSelectionChange: onSelectionChangeMethod
+          onSelectionChange: onSelectionChangeMethod,
+          assessmentId: props.assessmentId,
+          questionId: props.questionId,
+          disableComments: props.canSave // editor comments cannot be added before saving.
         }
       : undefined;
   const mcqProps = {

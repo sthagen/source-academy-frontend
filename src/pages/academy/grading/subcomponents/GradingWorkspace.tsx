@@ -198,7 +198,9 @@ class GradingWorkspace extends React.Component<GradingWorkspaceProps, State> {
               isEditorAutorun: false,
               sourceChapter: question?.library?.chapter || 4,
               sourceVariant: 'default',
-              externalLibraryName: question?.library?.external?.name || 'NONE'
+              externalLibraryName: question?.library?.external?.name || 'NONE',
+              submissionId: this.props.submissionId,
+              questionId: this.props.questionId,
             }
           : undefined,
       editorHeight: this.props.editorHeight,
@@ -288,6 +290,7 @@ class GradingWorkspace extends React.Component<GradingWorkspaceProps, State> {
     props: GradingWorkspaceProps,
     questionId: number
   ) => {
+    console.log('Re-render side content', props.grading![questionId].grade.grader)
     const tabs: SideContentTab[] = [
       {
         label: `Grading: Question ${questionId + 1}`,
@@ -297,6 +300,7 @@ class GradingWorkspace extends React.Component<GradingWorkspaceProps, State> {
           <GradingEditor
             solution={props.grading![questionId].question.solution}
             questionId={props.grading![questionId].question.id}
+            realQuestionId={questionId}
             submissionId={props.submissionId}
             initialGrade={props.grading![questionId].grade.grade}
             gradeAdjustment={props.grading![questionId].grade.gradeAdjustment}
@@ -305,7 +309,7 @@ class GradingWorkspace extends React.Component<GradingWorkspaceProps, State> {
             xpAdjustment={props.grading![questionId].grade.xpAdjustment}
             maxXp={props.grading![questionId].question.maxXp}
             studentName={props.grading![questionId].student.name}
-            comments={props.grading![questionId].grade.comments!}
+            comments={props.grading![questionId].comments!}
             graderName={
               props.grading![questionId].grade.grader
                 ? props.grading![questionId].grade.grader!.name

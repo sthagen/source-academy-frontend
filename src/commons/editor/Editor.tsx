@@ -20,7 +20,7 @@ import { ContextMenu as BPContextMenu } from '@blueprintjs/core';
 // =============== Hooks ===============
 // TODO: Should further refactor into EditorBase + different variants.
 // Ideally, hooks should be specified by the parent component instead.
-import useComments from './UseComments';
+import useComments, { CommentsStateProps } from './UseComments';
 import useHighlighting from './UseHighlighting';
 import useNavigation from './UseNavigation';
 import useRefactor from './UseRefactor';
@@ -72,7 +72,7 @@ type StateProps = {
   externalLibraryName?: string;
   sourceVariant?: Variant;
   hooks?: EditorHook[];
-};
+} & CommentsStateProps;
 
 type OnEvent = {
   onSelectionChange?: (value: any, event?: any) => void;
