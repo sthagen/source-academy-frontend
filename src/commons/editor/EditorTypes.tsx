@@ -1,5 +1,7 @@
 import AceEditor from 'react-ace';
 
+export type { IComment } from './CommentsAPI';
+
 export type Position = {
   row: number;
   column: number;
