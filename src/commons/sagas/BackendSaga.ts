@@ -276,7 +276,7 @@ function* BackendSaga(): SagaIterator {
       return yield call(showWarningMessage, 'Only staff can submit answers.');
     }
 
-    const { submissionId, questionId, gradeAdjustment, xpAdjustment, comments } = action.payload;
+    const { submissionId, questionId, gradeAdjustment, xpAdjustment } = action.payload;
     const tokens: Tokens = yield selectTokens();
 
     const resp: Response | null = yield postGrading(
@@ -284,8 +284,7 @@ function* BackendSaga(): SagaIterator {
       questionId,
       gradeAdjustment,
       xpAdjustment,
-      tokens,
-      comments
+      tokens
     );
     if (!resp || !resp.ok) {
       return yield handleResponseError(resp);

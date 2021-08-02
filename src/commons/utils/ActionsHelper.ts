@@ -4,6 +4,7 @@ import * as CommonsActions from '../../commons/application/actions/CommonsAction
 import * as InterpreterActions from '../../commons/application/actions/InterpreterActions';
 import * as SessionActions from '../../commons/application/actions/SessionActions';
 import * as CollabEditingActions from '../../commons/collabEditing/CollabEditingActions';
+import * as CommentsActions from '../../commons/editor/CommentsActions';
 import * as WorkspaceActions from '../../commons/workspace/WorkspaceActions';
 import * as AcademyActions from '../../features/academy/AcademyActions';
 import * as AchievementActions from '../../features/achievement/AchievementActions';
@@ -20,6 +21,7 @@ export const actions = {
   ...AchievementActions,
   ...CommonsActions,
   ...CollabEditingActions,
+  ...CommentsActions,
   ...DashboardActions,
   ...InterpreterActions,
   ...PlaygroundActions,

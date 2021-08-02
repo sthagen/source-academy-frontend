@@ -1,4 +1,6 @@
 import { Reducer } from 'redux';
+import { CommentsReducer } from 'src/commons/editor/CommentsReducer';
+import { ADD_COMMENT_ASSESSMENT, ADD_COMMENT_SUBMISSION, REMOVE_COMMENT_ASSESSMENT, REMOVE_COMMENT_SUBMISSION, UPDATE_COMMENT_ASSESSMENT, UPDATE_COMMENT_SUBMISSION } from 'src/commons/editor/CommentTypes';
 
 import {
   REMOTE_EXEC_UPDATE_DEVICES,
@@ -29,6 +31,14 @@ export const SessionsReducer: Reducer<SessionState> = (
   action: SourceActionType
 ) => {
   switch (action.type) {
+    case ADD_COMMENT_SUBMISSION:
+    case ADD_COMMENT_ASSESSMENT:
+    case UPDATE_COMMENT_SUBMISSION: 
+    case UPDATE_COMMENT_ASSESSMENT: 
+    case REMOVE_COMMENT_SUBMISSION: 
+    case REMOVE_COMMENT_ASSESSMENT: 
+      return CommentsReducer(state, action);
+
     case LOG_OUT:
       return defaultSession;
     case SET_GITHUB_ASSESSMENT:

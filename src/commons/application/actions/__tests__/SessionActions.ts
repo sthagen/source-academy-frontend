@@ -218,8 +218,7 @@ test('submitGrading generates correct action object with default values', () => 
       submissionId,
       questionId,
       gradeAdjustment: 0,
-      xpAdjustment: 0,
-      comments: undefined
+      xpAdjustment: 0
     }
   });
 });
@@ -235,8 +234,7 @@ test('submitGradingAndContinue generates correct action object with default valu
       submissionId,
       questionId,
       gradeAdjustment: 0,
-      xpAdjustment: 0,
-      comments: undefined
+      xpAdjustment: 0
     }
   });
 });
@@ -246,8 +244,7 @@ test('submitGrading generates correct action object', () => {
   const questionId = 3;
   const gradeAdjustment = 10;
   const xpAdjustment = 100;
-  const comments = 'my comment';
-  const action = submitGrading(submissionId, questionId, gradeAdjustment, xpAdjustment, comments);
+  const action = submitGrading(submissionId, questionId, gradeAdjustment, xpAdjustment);
   expect(action).toEqual({
     type: SUBMIT_GRADING,
     payload: {
@@ -255,7 +252,6 @@ test('submitGrading generates correct action object', () => {
       questionId,
       gradeAdjustment,
       xpAdjustment,
-      comments
     }
   });
 });
@@ -265,13 +261,11 @@ test('submitGradingAndContinue generates correct action object', () => {
   const questionId = 7;
   const gradeAdjustment = 90;
   const xpAdjustment = 55;
-  const comments = 'another comment';
   const action = submitGradingAndContinue(
     submissionId,
     questionId,
     gradeAdjustment,
     xpAdjustment,
-    comments
   );
   expect(action).toEqual({
     type: SUBMIT_GRADING_AND_CONTINUE,
@@ -280,7 +274,6 @@ test('submitGradingAndContinue generates correct action object', () => {
       questionId,
       gradeAdjustment,
       xpAdjustment,
-      comments
     }
   });
 });
@@ -416,7 +409,6 @@ test('updateGrading generates correct action object', () => {
         gradeAdjustment: 0,
         xp: 100,
         xpAdjustment: 0,
-        comments: 'Well done.',
         grader: {
           name: 'HARTIN MENZ',
           id: 100

@@ -1,7 +1,5 @@
 import AceEditor from 'react-ace';
 
-export type { IComment } from './CommentsAPI';
-
 export type Position = {
   row: number;
   column: number;
@@ -41,3 +39,33 @@ export interface IAutocompletionResult {
 }
 
 export type HighlightedLines = [number, number]; // Start line, end line.
+
+
+// ------------ Comments --------------
+
+// This is the data that's sent around.
+export interface ICommentBase {
+  id: string;
+  // TODO: Reference user differently.
+  userId: string;
+  username: string;
+  linenum: number;
+  text: string;
+  datetime: number; // if this is infinity, means not submitted yet!
+  // Infinity so it gets sorted to bottom.
+}
+
+// Includes derived data
+export interface IComment extends ICommentBase {
+  profilePic: string;
+  meta: ICommentMeta;
+}
+
+export interface ICommentMeta {
+  editing?: IComment; // Stores a copy which is being edited.
+  isCollapsed: boolean;
+  error?: string;
+}
+
+export type IComments = { [lineNo: number]: IComment[] }
+

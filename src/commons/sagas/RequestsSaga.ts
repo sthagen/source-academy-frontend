@@ -33,6 +33,8 @@ import {
   frontendifyAchievementItem
 } from '../achievement/utils/AchievementBackender';
 import { Tokens, User } from '../application/types/SessionTypes';
+import { IComments } from '../editor/EditorTypes';
+import { makeMockComment } from '../mocks/AssessmentMocks';
 import { Notification } from '../notificationBadge/NotificationBadgeTypes';
 import { actions } from '../utils/ActionsHelper';
 import { castLibrary } from '../utils/CastBackend';
@@ -550,6 +552,18 @@ export const getGradingOverviews = async (
     );
 };
 
+
+// TODO: Implement the actual thing
+// The current comments are simply a single string.
+// In the future need to just fill in the meta fields.
+function mockProcessComments(currComments?: string): IComments {
+  if(!currComments) { return {}; }
+  return {
+    "-1": [makeMockComment(-1, currComments)],
+    "0": [makeMockComment(0, 'This is a test inline comment')]
+  }
+}
+
 /**
  * GET /admin/grading/{submissionId}
  */
@@ -589,8 +603,8 @@ export const getGrading = async (submissionId: number, tokens: Tokens): Promise<
         xp: grade.xp,
         gradeAdjustment: grade.adjustment,
         xpAdjustment: grade.xpAdjustment,
-        comments: grade.comments
-      }
+      },
+      comments: mockProcessComments(grade.comments)
     } as GradingQuestion;
 
     if (gradingQuestion.grade.grader !== null) {
@@ -613,7 +627,6 @@ export const postGrading = async (
   gradeAdjustment: number,
   xpAdjustment: number,
   tokens: Tokens,
-  comments?: string
 ): Promise<Response | null> => {
   const resp = await request(`admin/grading/${submissionId}/${questionId}`, 'POST', {
     ...tokens,
@@ -621,7 +634,6 @@ export const postGrading = async (
       grading: {
         adjustment: gradeAdjustment,
         xpAdjustment,
-        comments
       }
     },
     noHeaderAccept: true,

@@ -1,6 +1,7 @@
 import { SourceError, Variant } from 'js-slang/dist/types';
 
 import { ExternalLibrary, ExternalLibraryName } from '../application/types/ExternalTypes';
+import { IComments } from '../editor/EditorTypes';
 
 export const FETCH_ASSESSMENT_OVERVIEWS = 'FETCH_ASSESSMENT_OVERVIEWS';
 export const SUBMIT_ASSESSMENT = 'SUBMIT_ASSESSMENT';
@@ -124,7 +125,7 @@ export interface IContestVotingQuestion extends BaseQuestion {
 
 export type BaseQuestion = {
   answer: string | number | ContestEntry[] | null;
-  comments?: string;
+  comments?: IComments;
   content: string;
   editorValue?: string | null;
   grade: number;

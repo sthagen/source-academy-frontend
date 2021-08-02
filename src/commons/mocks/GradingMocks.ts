@@ -1,7 +1,7 @@
 import { GradingSummary } from '../../features/dashboard/DashboardTypes';
 import { Grading, GradingOverview } from '../../features/grading/GradingTypes';
 import { Testcase, TestcaseTypes } from '../assessment/AssessmentTypes';
-import { mockRuneLibrary } from './AssessmentMocks';
+import { makeMockComment, mockRuneLibrary } from './AssessmentMocks';
 import { mockFetchRole, Role, Roles } from './UserMocks';
 
 export const mockGradingOverviews: GradingOverview[] = [
@@ -189,31 +189,6 @@ function remainder(n, d) {
       xpAdjustment: 0,
       grade: 0,
       xp: 0,
-      comments: `Good job. You are awarded the full marks!
-
-----
-## markdown test
-
-# header
-
-**bold**
-
-_italics_
-
-* list
-
-1. numbered list
-
-- [] checkboxes
-
-> quote
-
-    code
-
-[link to Source Academy](https://sourceacademy.nus.edu.sg)
-
-![](image-url-goes-here)
-      `,
       grader: {
         name: 'HARTIN MENZ',
         id: 100
@@ -223,7 +198,35 @@ _italics_
     student: {
       name: 'Al Gorithm',
       id: 0
-    }
+    },
+    comments: { "-1": 
+      [makeMockComment(-1, 
+        `Good job. You are awarded the full marks!
+
+        ----
+        ## markdown test
+        
+        # header
+        
+        **bold**
+        
+        _italics_
+        
+        * list
+        
+        1. numbered list
+        
+        - [] checkboxes
+        
+        > quote
+        
+            code
+        
+        [link to Source Academy](https://sourceacademy.nus.edu.sg)
+        
+        ![](image-url-goes-here)
+      `)]
+    },
   },
   {
     question: {
@@ -277,41 +280,43 @@ _italics_
       xpAdjustment: 0,
       grade: 100,
       xp: 100,
-      comments: `You open the Report Card, not knowing what to expect...
+    },
+    comments: {
+      "-1": [makeMockComment(-1, `You open the Report Card, not knowing what to expect...
 
-## WOW!
-Amazing grasp of runes. We can now move on to the next assignment.
-
-<br/>
-
-Robot Dog: \`woof\`
-
-You look at the display of the robot dog.
-
-    FEED ME
-1. Bread
-2. Water
-
-<br/>
-
-* I am hungry.
-* I am thirsty.
-
-<br/>
-<br/>
-
-New message from **Avenger**!
-
-> _Cadet, please meet me at Level X-05, outside the pod bay doors. There is an important mission awaiting us._
-
-> _May the [Source](https://sourceacademy.nus.edu.sg) be with you._
-
-> Best regards, Avocado A. Avenger
-
-#### Upcoming Tasks
-- [] Meet Avenger Avenger at Level X-05
-- [] Open the Pod Bay Doors
-      `
+      ## WOW!
+      Amazing grasp of runes. We can now move on to the next assignment.
+      
+      <br/>
+      
+      Robot Dog: \`woof\`
+      
+      You look at the display of the robot dog.
+      
+          FEED ME
+      1. Bread
+      2. Water
+      
+      <br/>
+      
+      * I am hungry.
+      * I am thirsty.
+      
+      <br/>
+      <br/>
+      
+      New message from **Avenger**!
+      
+      > _Cadet, please meet me at Level X-05, outside the pod bay doors. There is an important mission awaiting us._
+      
+      > _May the [Source](https://sourceacademy.nus.edu.sg) be with you._
+      
+      > Best regards, Avocado A. Avenger
+      
+      #### Upcoming Tasks
+      - [] Meet Avenger Avenger at Level X-05
+      - [] Open the Pod Bay Doors
+            `)]
     },
     student: {
       name: 'Al Gorithm',

@@ -142,7 +142,7 @@ export function* mockBackendSaga(): SagaIterator {
   const sendGrade = function* (
     action: ReturnType<typeof actions.submitGrading | typeof actions.submitGradingAndContinue>
   ) {
-    const { submissionId, questionId, gradeAdjustment, xpAdjustment, comments } = action.payload;
+    const { submissionId, questionId, gradeAdjustment, xpAdjustment } = action.payload;
     // Now, update the grade for the question in the Grading in the store
     const grading: Grading = yield select((state: OverallState) =>
       state.session.gradings.get(submissionId)
@@ -154,7 +154,6 @@ export function* mockBackendSaga(): SagaIterator {
           xpAdjustment,
           grade: gradingQuestion.grade.grade,
           xp: gradingQuestion.grade.xp,
-          comments
         };
       }
       return gradingQuestion;

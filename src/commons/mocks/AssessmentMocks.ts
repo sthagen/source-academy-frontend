@@ -11,6 +11,7 @@ import {
   Library,
   TestcaseTypes
 } from '../assessment/AssessmentTypes';
+import { IComment } from '../editor/EditorTypes';
 
 const mockUnopenedAssessmentsOverviews: AssessmentOverview[] = [
   {
@@ -427,6 +428,21 @@ export const mockAssessmentQuestions: Array<IProgrammingQuestion | IMCQQuestion>
   }
 ];
 
+export function makeMockComment(lineNo: number, text: string): IComment {
+  return {
+    profilePic: '/profiles/123.png',
+    userId: "1",
+    id: "1",
+    username: "test user",
+    linenum: lineNo,
+    text,
+    datetime: (new Date(2020, 8, 8)).getTime(),
+    meta: {
+      isCollapsed: false
+    }
+  };
+}
+
 export const mockClosedAssessmentQuestions: Array<IProgrammingQuestion | IMCQQuestion> = [
   {
     answer: `function fibonacci(n) {
@@ -474,30 +490,32 @@ export const mockClosedAssessmentQuestions: Array<IProgrammingQuestion | IMCQQue
     grade: 0,
     maxGrade: 2,
     maxXp: 2,
-    comments: `Good job. You are awarded the full marks!
-  
-  ----
-  ## markdown test
-  
-  # header
-  
-  **bold**
-  
-  _italics_
-  
-  * list
-  
-  1. numbered list
-  
-  - [] checkboxes
-  
-  > quote
-  
-      code
-  
-  [link to Source Academy](https://sourceacademy.nus.edu.sg)  
-  
-  ![](image-url-goes-here)`,
+    comments: { '-1': 
+      [makeMockComment(-1, `Good job. You are awarded the full marks!
+    
+      ----
+      ## markdown test
+      
+      # header
+      
+      **bold**
+      
+      _italics_
+      
+      * list
+      
+      1. numbered list
+      
+      - [] checkboxes
+      
+      > quote
+      
+          code
+      
+      [link to Source Academy](https://sourceacademy.nus.edu.sg)  
+      
+      ![](image-url-goes-here)`)]
+    },
     autogradingResults: [
       {
         resultType: 'pass'
@@ -547,7 +565,8 @@ export const mockClosedAssessmentQuestions: Array<IProgrammingQuestion | IMCQQue
     grade: 0,
     maxGrade: 2,
     maxXp: 2,
-    comments: `You open the Report Card, not knowing what to expect...
+    comments: {
+      "-1": [makeMockComment(-1, `You open the Report Card, not knowing what to expect...
   
       ## WOW!
       Amazing grasp of runes. We can now move on to the next assignment.
@@ -580,7 +599,8 @@ export const mockClosedAssessmentQuestions: Array<IProgrammingQuestion | IMCQQue
       
       #### Upcoming Tasks
       - [] Meet Avenger Avenger at Level X-05
-      - [] Open the Pod Bay Doors`,
+      - [] Open the Pod Bay Doors`)]
+    },
     autogradingResults: []
   }
 ];
