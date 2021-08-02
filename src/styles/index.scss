@@ -1,3 +1,5 @@
+@use 'sass:math';
+
 @import '~normalize.css/normalize.css';
 @import '~@blueprintjs/core/lib/css/blueprint.css';
 @import '~@blueprintjs/datetime/lib/css/blueprint-datetime.css';
@@ -26,8 +28,10 @@
 @import 'contributors';
 @import 'dialogs';
 @import 'dropdown';
+@import 'envvisualizer';
 @import 'game';
 @import 'github';
+@import 'githubAssessments';
 @import 'storysimulator';
 @import 'groundcontrol';
 @import 'login';
@@ -35,6 +39,7 @@
 @import 'navigationBar';
 @import 'nopage';
 @import 'playground';
+@import 'sicp';
 @import 'sourcereel';
 @import 'sourcecast';
 @import 'variableHighlighting';

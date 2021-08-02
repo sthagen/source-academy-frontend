@@ -96,9 +96,8 @@ const MobileWorkspace: React.FC<MobileWorkspaceProps> = props => {
   const editorRef = React.useRef<ReactAce>(null);
   const replRef = React.useRef<ReactAce>(null);
   const emptyRef = React.useRef<ReactAce>(null);
-  const [keyboardInputRef, setKeyboardInputRef] = React.useState<React.RefObject<ReactAce>>(
-    emptyRef
-  );
+  const [keyboardInputRef, setKeyboardInputRef] =
+    React.useState<React.RefObject<ReactAce>>(emptyRef);
 
   React.useEffect(() => {
     editorRef.current?.editor.on('focus', () => {
@@ -197,6 +196,10 @@ const MobileWorkspace: React.FC<MobileWorkspaceProps> = props => {
     };
   };
 
+  const inAssessmentWorkspace =
+    props.mobileSideContentProps.workspaceLocation === 'assessment' ||
+    props.mobileSideContentProps.workspaceLocation === 'githubAssessment';
+
   return (
     <div className="workspace mobile-workspace">
       {props.hasUnsavedChanges ? (
@@ -206,7 +209,7 @@ const MobileWorkspace: React.FC<MobileWorkspaceProps> = props => {
       ) : null}
 
       {/* Render the top ControlBar when it is the Assessment Workspace */}
-      {props.mobileSideContentProps.workspaceLocation === 'assessment' && (
+      {inAssessmentWorkspace && (
         <ControlBar {...props.mobileSideContentProps.mobileControlBarProps} />
       )}
 

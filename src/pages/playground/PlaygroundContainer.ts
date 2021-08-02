@@ -21,7 +21,6 @@ import {
   setSharedbConnected
 } from '../../commons/collabEditing/CollabEditingActions';
 import { Position } from '../../commons/editor/EditorTypes';
-import { SideContentType } from '../../commons/sideContent/SideContentTypes';
 import {
   browseReplHistoryDown,
   browseReplHistoryUp,
@@ -41,7 +40,7 @@ import {
   sendReplInputToOutput,
   setEditorBreakpoint,
   toggleEditorAutorun,
-  updateActiveTab,
+  toggleUsingSubst,
   updateEditorValue,
   updateReplValue
 } from '../../commons/workspace/WorkspaceActions';
@@ -60,7 +59,6 @@ import {
 import {
   generateLzString,
   shortenURL,
-  toggleUsingSubst,
   updateShortURL
 } from '../../features/playground/PlaygroundActions';
 import Playground, { DispatchProps, StateProps } from './Playground';
@@ -87,10 +85,10 @@ const mapStateToProps: MapStateToProps<StateProps, {}, OverallState> = state => 
   sourceVariant: state.workspaces.playground.context.variant,
   sharedbConnected: state.workspaces.playground.sharedbConnected,
   externalLibraryName: state.workspaces.playground.externalLibrary,
-  usingSubst: state.playground.usingSubst,
+  usingSubst: state.workspaces.playground.usingSubst,
   persistenceUser: state.session.googleUser,
   persistenceFile: state.playground.persistenceFile,
-  githubOctokitInstance: state.session.githubOctokitInstance,
+  githubOctokitObject: state.session.githubOctokitObject,
   githubSaveInfo: state.playground.githubSaveInfo
 });
 
@@ -99,8 +97,6 @@ const workspaceLocation: WorkspaceLocation = 'playground';
 const mapDispatchToProps: MapDispatchToProps<DispatchProps, {}> = (dispatch: Dispatch) =>
   bindActionCreators(
     {
-      handleActiveTabChange: (activeTab: SideContentType) =>
-        updateActiveTab(activeTab, workspaceLocation),
       handleBrowseHistoryDown: () => browseReplHistoryDown(workspaceLocation),
       handleBrowseHistoryUp: () => browseReplHistoryUp(workspaceLocation),
       handleChangeExecTime: (execTime: number) =>
@@ -135,7 +131,7 @@ const mapDispatchToProps: MapDispatchToProps<DispatchProps, {}> = (dispatch: Dis
       handleSideContentHeightChange: (heightChange: number) =>
         changeSideContentHeight(heightChange, workspaceLocation),
       handleToggleEditorAutorun: () => toggleEditorAutorun(workspaceLocation),
-      handleUsingSubst: (usingSubst: boolean) => toggleUsingSubst(usingSubst),
+      handleUsingSubst: (usingSubst: boolean) => toggleUsingSubst(usingSubst, workspaceLocation),
       handleDebuggerPause: () => beginDebuggerPause(workspaceLocation),
       handleDebuggerResume: () => debuggerResume(workspaceLocation),
       handleDebuggerReset: () => debuggerReset(workspaceLocation),

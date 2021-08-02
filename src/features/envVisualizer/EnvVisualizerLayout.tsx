@@ -1,6 +1,5 @@
 import { Context } from 'js-slang';
 import { Frame } from 'js-slang/dist/types';
-import { cloneDeep } from 'lodash';
 import React from 'react';
 import { Rect } from 'react-konva';
 import { Layer, Stage } from 'react-konva';
@@ -14,6 +13,7 @@ import { Value } from './components/values/Value';
 import { Config, ShapeDefaultProps } from './EnvVisualizerConfig';
 import { Data, EnvTree, EnvTreeNode, ReferenceType } from './EnvVisualizerTypes';
 import {
+  deepCopyTree,
   isArray,
   isEmptyEnvironment,
   isFn,
@@ -38,8 +38,7 @@ export class Layout {
   static globalEnvNode: EnvTreeNode;
   /** array of levels, which themselves are arrays of frames */
   static levels: Level[];
-  /** the Value objects in this layout. note that this corresponds to the data array,
-   * that is, `value[i]` has underlying data `data[i]` */
+  /** memoized values */
   static values = new Map<Data, Value>();
   /** memoized layout */
   static prevLayout: React.ReactNode;
@@ -50,7 +49,8 @@ export class Layout {
     Layout.values.clear();
     Layout.levels = [];
     Layout.key = 0;
-    Layout.environmentTree = cloneDeep(context.runtime.environmentTree as EnvTree);
+    // deep copy so we don't mutate the context
+    Layout.environmentTree = deepCopyTree(context.runtime.environmentTree as EnvTree);
     Layout.globalEnvNode = Layout.environmentTree.root;
 
     // remove program environment and merge bindings into global env
@@ -66,6 +66,7 @@ export class Layout {
       Config.CanvasMinHeight,
       lastLevel.y + lastLevel.height + Config.CanvasPaddingY
     );
+
     Layout.width = Math.max(
       Config.CanvasMinWidth,
       Layout.levels.reduce<number>((maxWidth, level) => Math.max(maxWidth, level.width), 0) +
@@ -152,12 +153,16 @@ export class Layout {
         return [c];
       }
     };
+
     let frontier: EnvTreeNode[] = [Layout.globalEnvNode];
     let prevLevel: Level | null = null;
+    let currLevel: Level;
+
     while (frontier.length > 0) {
-      const currLevel: Level = new Level(prevLevel, frontier);
+      currLevel = new Level(prevLevel, frontier);
       this.levels.push(currLevel);
       const nextFrontier: EnvTreeNode[] = [];
+
       frontier.forEach(e => {
         e.children.forEach(c => {
           const nextChildren = getNextChildren(c as EnvTreeNode);
@@ -165,12 +170,13 @@ export class Layout {
           nextFrontier.push(...nextChildren);
         });
       });
+
       prevLevel = currLevel;
       frontier = nextFrontier;
     }
   }
 
-  /** memoize `Value` (used to detect cyclic references in non-primitive `Value`) */
+  /** memoize `Value` (used to detect circular references in non-primitive `Value`) */
   static memoizeValue(value: Value): void {
     Layout.values.set(value.data, value);
   }
@@ -213,21 +219,23 @@ export class Layout {
       return Layout.prevLayout;
     } else {
       const layout = (
-        <Stage width={Layout.width} height={Layout.height}>
-          <Layer>
-            <Rect
-              {...ShapeDefaultProps}
-              x={0}
-              y={0}
-              width={Layout.width}
-              height={Layout.height}
-              fill={Config.SA_BLUE.toString()}
-              key={Layout.key++}
-              listening={false}
-            />
-            {Layout.levels.map(level => level.draw())}
-          </Layer>
-        </Stage>
+        <div className={'sa-env-visualizer'}>
+          <Stage width={Layout.width} height={Layout.height}>
+            <Layer>
+              <Rect
+                {...ShapeDefaultProps}
+                x={0}
+                y={0}
+                width={Layout.width}
+                height={Layout.height}
+                fill={Config.SA_BLUE.toString()}
+                key={Layout.key++}
+                listening={false}
+              />
+              {Layout.levels.map(level => level.draw())}
+            </Layer>
+          </Stage>
+        </div>
       );
       Layout.prevLayout = layout;
       return layout;

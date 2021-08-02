@@ -14,7 +14,6 @@ import { ControlBarExternalLibrarySelect } from '../../../commons/controlBar/Con
 import { HighlightedLines, Position } from '../../../commons/editor/EditorTypes';
 import SideContentDataVisualizer from '../../../commons/sideContent/SideContentDataVisualizer';
 import SideContentEnvVisualizer from '../../../commons/sideContent/SideContentEnvVisualizer';
-import SideContentInspector from '../../../commons/sideContent/SideContentInspector';
 import { SideContentTab, SideContentType } from '../../../commons/sideContent/SideContentTypes';
 import SourceRecorderControlBar, {
   SourceRecorderControlBarProps
@@ -38,7 +37,6 @@ import SourcereelControlbar from './subcomponents/SourcereelControlbar';
 type SourcereelProps = DispatchProps & StateProps;
 
 export type DispatchProps = {
-  handleActiveTabChange: (activeTab: SideContentType) => void;
   handleBrowseHistoryDown: () => void;
   handleBrowseHistoryUp: () => void;
   handleChapterSelect: (chapter: number) => void;
@@ -115,7 +113,6 @@ export type StateProps = {
   recordingStatus: RecordingStatus;
   replValue: string;
   timeElapsedBeforePause: number;
-  sideContentActiveTab: SideContentType;
   sideContentHeight?: number;
   sourcecastIndex: SourcecastData[] | null;
   sourceChapter: number;
@@ -123,7 +120,19 @@ export type StateProps = {
   timeResumed: number;
 };
 
-class Sourcereel extends React.Component<SourcereelProps> {
+type State = {
+  selectedTab: SideContentType;
+};
+
+class Sourcereel extends React.Component<SourcereelProps, State> {
+  public constructor(props: SourcereelProps) {
+    super(props);
+
+    this.state = {
+      selectedTab: SideContentType.sourcereel
+    };
+  }
+
   public componentDidMount() {
     this.props.handleFetchSourcecastIndex();
   }
@@ -137,7 +146,7 @@ class Sourcereel extends React.Component<SourcereelProps> {
 
     switch (inputToApply.type) {
       case 'activeTabChange':
-        this.props.handleActiveTabChange(inputToApply.data);
+        this.setState({ selectedTab: inputToApply.data });
         break;
       case 'chapterSelect':
         this.props.handleChapterSelect(inputToApply.data);
@@ -255,7 +264,7 @@ class Sourcereel extends React.Component<SourcereelProps> {
     };
 
     const activeTabChangeHandler = (activeTab: SideContentType) => {
-      this.props.handleActiveTabChange(activeTab);
+      this.setState({ selectedTab: activeTab });
       if (this.props.recordingStatus !== RecordingStatus.recording) {
         return;
       }
@@ -290,8 +299,14 @@ class Sourcereel extends React.Component<SourcereelProps> {
       },
       sideContentHeight: this.props.sideContentHeight,
       sideContentProps: {
-        handleActiveTabChange: activeTabChangeHandler,
-        selectedTabId: this.props.sideContentActiveTab,
+        onChange: activeTabChangeHandler,
+        selectedTabId: this.state.selectedTab,
+        /**
+         * NOTE: An ag-grid console warning is shown here on load as the 'Sourcecast Table' tab
+         * is not the default tab, and the ag-grid table inside it has not been rendered.
+         * This is a known issue with ag-grid, and is okay since only staff and admins have
+         * access to Sourcereel. For more info, see issue #1152 in frontend.
+         */
         tabs: [
           {
             label: 'Recording Panel',
@@ -339,7 +354,6 @@ class Sourcereel extends React.Component<SourcereelProps> {
             toSpawn: () => true
           },
           dataVisualizerTab,
-          inspectorTab,
           envVisualizerTab
         ],
         workspaceLocation: 'sourcereel'
@@ -400,19 +414,11 @@ const dataVisualizerTab: SideContentTab = {
   toSpawn: () => true
 };
 
-const inspectorTab: SideContentTab = {
-  label: 'Inspector',
-  iconName: IconNames.SEARCH,
-  body: <SideContentInspector />,
-  id: SideContentType.inspector,
-  toSpawn: () => true
-};
-
 const envVisualizerTab: SideContentTab = {
   label: 'Env Visualizer',
   iconName: IconNames.GLOBE,
   body: <SideContentEnvVisualizer />,
-  id: SideContentType.envVisualiser,
+  id: SideContentType.envVisualizer,
   toSpawn: () => true
 };
 

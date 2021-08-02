@@ -1,10 +1,17 @@
 import { shallow } from 'enzyme';
 
-import { Library } from '../../assessment/AssessmentTypes';
+import { ContestEntry, Library } from '../../assessment/AssessmentTypes';
+import { EditorProps } from '../../editor/Editor';
 import { Position } from '../../editor/EditorTypes';
 import { mockAssessments } from '../../mocks/AssessmentMocks';
-import { SideContentType } from '../../sideContent/SideContentTypes';
 import AssessmentWorkspace, { AssessmentWorkspaceProps } from '../AssessmentWorkspace';
+const MockEditor = (props: EditorProps) => <div id="mock-editor">{props.editorValue}</div>;
+// mock editor for testing update
+jest.mock('../../editor/Editor', () => (props: EditorProps) => (
+  <MockEditor {...props}></MockEditor>
+));
+
+const mockedHandleEditorValueChange = jest.fn();
 
 const defaultProps: AssessmentWorkspaceProps = {
   assessmentId: 0,
@@ -19,14 +26,13 @@ const defaultProps: AssessmentWorkspaceProps = {
   breakpoints: [],
   highlightedLines: [],
   hasUnsavedChanges: false,
-  handleActiveTabChange: (activeTab: SideContentType) => {},
   handleAssessmentFetch: (assessmentId: number) => {},
   handleBrowseHistoryDown: () => {},
   handleBrowseHistoryUp: () => {},
   handleClearContext: (library: Library, shouldInitLibrary: boolean) => {},
   handleDeclarationNavigate: (cursorPosition: Position) => {},
   handleEditorEval: () => {},
-  handleEditorValueChange: (val: string) => {},
+  handleEditorValueChange: mockedHandleEditorValueChange,
   handleEditorHeightChange: (height: number) => {},
   handleEditorWidthChange: (widthChange: number) => {},
   handleEditorUpdateBreakpoints: (breakpoints: string[]) => {},
@@ -36,9 +42,10 @@ const defaultProps: AssessmentWorkspaceProps = {
   handleReplValueChange: (newValue: string) => {},
   handleSendReplInputToOutput: (code: string) => {},
   handleResetWorkspace: () => {},
-  handleSave: (id: number, answer: string | number) => {},
+  handleSave: (id: number, answer: number | string | ContestEntry[]) => {},
   handleSideContentHeightChange: (heightChange: number) => {},
   handleTestcaseEval: (testcaseId: number) => {},
+  handleRunAllTestcases: () => {},
   handleUpdateHasUnsavedChanges: (hasUnsavedChanges: boolean) => {},
   handleUpdateCurrentAssessmentId: (a: number, q: number) => {},
   handleDebuggerPause: () => {},
@@ -81,6 +88,14 @@ const mockMcqAssessmentWorkspaceProps: AssessmentWorkspaceProps = {
   assessment: mockAssessments[0],
   assessmentId: 0,
   questionId: 2
+};
+
+// set questionId to index 0 since contest voting only has 1 question
+const mockContestVotingAssessmentWorkspaceProps: AssessmentWorkspaceProps = {
+  ...defaultProps,
+  assessment: mockAssessments[6],
+  assessmentId: 7,
+  questionId: 0
 };
 
 test('AssessmentWorkspace page "loading" content renders correctly', () => {
@@ -136,6 +151,12 @@ test('AssessmentWorkspace page with MCQ question renders correctly', () => {
       Current workaround is to mount AssessmentWorkspace shallowly since the behaviour is correct
       during user testing
 */
+
+test('AssessmentWorkspace page with ContestVoting question renders correctly', () => {
+  const app = <AssessmentWorkspace {...mockContestVotingAssessmentWorkspaceProps} />;
+  const tree = shallow(app);
+  expect(tree.debug()).toMatchSnapshot();
+});
 
 test('AssessmentWorkspace renders Grading tab correctly if the question has been graded', () => {
   const app = <AssessmentWorkspace {...mockGradedProgrammingAssessmentWorkspaceProps} />;

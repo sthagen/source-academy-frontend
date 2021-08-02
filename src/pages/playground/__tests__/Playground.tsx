@@ -1,13 +1,11 @@
 import { shallow } from 'enzyme';
 import { Variant } from 'js-slang/dist/types';
-import * as React from 'react';
 import { Provider } from 'react-redux';
 import { mockInitialStore } from 'src/commons/mocks/StoreMocks';
 
 import { ExternalLibraryName } from '../../../commons/application/types/ExternalTypes';
 import { Position } from '../../../commons/editor/EditorTypes';
 import { mockRouterProps } from '../../../commons/mocks/ComponentMocks';
-import { SideContentType } from '../../../commons/sideContent/SideContentTypes';
 import Playground, { PlaygroundProps } from '../Playground';
 
 const baseProps = {
@@ -32,9 +30,8 @@ const baseProps = {
   usingSubst: false,
   persistenceUser: undefined,
   persistenceFile: undefined,
-  githubOctokitInstance: undefined,
+  githubOctokitObject: { octokit: undefined },
   githubSaveInfo: { repoName: '', filePath: '' },
-  handleActiveTabChange: (activeTab: SideContentType) => {},
   handleBrowseHistoryDown: () => {},
   handleBrowseHistoryUp: () => {},
   handleChangeExecTime: (execTime: number) => {},

@@ -37,7 +37,6 @@
         p {
           font-size: 0.9em;
           margin: 0;
-          text-decoration: underline;
         }
       }
 
@@ -108,6 +107,32 @@
     .level,
     h3 {
       margin: 0 $default-spacing;
+    }
+  }
+
+  .achievement-manual-editor {
+    $default-spacing: 0.5em;
+
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    padding: $default-spacing;
+    color: white;
+
+    input {
+      display: inline-flex;
+      margin: 0 $default-spacing;
+    }
+
+    button {
+      background: white;
+      display: inline-flex;
+      margin: 0 $default-spacing;
+    }
+
+    h3 {
+      margin: 0 $default-spacing;
+      display: inline-flex;
     }
   }
 
@@ -211,7 +236,7 @@
               align-items: center;
               display: flex;
               flex-direction: row;
-              height: $card-height * 3 / 5;
+              height: math.div($card-height * 3, 5);
             }
 
             .details {
@@ -258,7 +283,7 @@
           $shrink-factor: 0.9;
           $line-width: 1em;
           // remaining-width is the empty space between line and card
-          $remaining-width: ((1 - $shrink-factor) * $card-width - 2 * $line-width) / 2;
+          $remaining-width: math.div((1 - $shrink-factor) * $card-width - 2 * $line-width, 2);
           $top-spacing: 0.2em;
 
           display: flex;
@@ -271,7 +296,7 @@
 
             .dropdown-lines {
               height: $top-spacing + $card-height;
-              margin: -#{$card-height / 2} -#{$line-width + $remaining-width} 0 $line-width;
+              margin: -#{math.div($card-height, 2)} -#{$line-width + $remaining-width} 0 $line-width;
               min-width: $line-width;
             }
 
@@ -283,7 +308,7 @@
 
           .prerequisite:first-child {
             .dropdown-lines {
-              height: $top-spacing + $card-height / 2;
+              height: $top-spacing + math.div($card-height, 2);
               margin-top: 0;
             }
           }

@@ -7,7 +7,6 @@ import { Grading } from '../../features/grading/GradingTypes';
 import { PlaygroundState } from '../../features/playground/PlaygroundTypes';
 import { PlaybackStatus, RecordingStatus } from '../../features/sourceRecorder/SourceRecorderTypes';
 import { Assessment } from '../assessment/AssessmentTypes';
-import { SideContentType } from '../sideContent/SideContentTypes';
 import Constants from '../utils/Constants';
 import { createContext } from '../utils/JsSlangHelper';
 import {
@@ -175,11 +174,11 @@ export const defaultDashboard: DashboardState = {
 
 export const defaultAchievement: AchievementState = {
   achievements: [],
-  goals: []
+  goals: [],
+  users: []
 };
 
 export const defaultPlayground: PlaygroundState = {
-  usingSubst: false,
   githubSaveInfo: { repoName: '', filePath: '' }
 };
 
@@ -202,7 +201,9 @@ export const createDefaultWorkspace = (workspaceLocation: WorkspaceLocation): Wo
   ),
   editorPrepend: '',
   editorSessionId: '',
-  editorValue: workspaceLocation === 'playground' || 'sourcecast' ? defaultEditorValue : '',
+  editorValue: ['playground', 'sourcecast', 'githubAssessments'].includes(workspaceLocation)
+    ? defaultEditorValue
+    : '',
   editorPostpend: '',
   editorReadonly: false,
   editorTestcases: [],
@@ -219,7 +220,6 @@ export const createDefaultWorkspace = (workspaceLocation: WorkspaceLocation): Wo
   },
   replValue: '',
   sharedbConnected: false,
-  sideContentActiveTab: SideContentType.questionOverview,
   stepLimit: 1000,
   globals: [],
   isEditorAutorun: false,
@@ -272,6 +272,14 @@ export const defaultWorkspaceManager: WorkspaceManagerState = {
     recordingStatus: RecordingStatus.notStarted,
     timeElapsedBeforePause: 0,
     timeResumed: 0
+  },
+  sicp: {
+    ...createDefaultWorkspace('sicp'),
+    usingSubst: false
+  },
+  githubAssessment: {
+    ...createDefaultWorkspace('githubAssessment'),
+    hasUnsavedChanges: false
   }
 };
 
@@ -279,6 +287,9 @@ export const defaultSession: SessionState = {
   accessToken: undefined,
   assessments: new Map<number, Assessment>(),
   assessmentOverviews: undefined,
+  experimentApproval: false, // TODO: get this from backend or sth
+  experimentCoinflip: Math.random() < 0.5,
+  githubOctokitObject: { octokit: undefined },
   grade: 0,
   gradingOverviews: undefined,
   gradings: new Map<number, Grading>(),

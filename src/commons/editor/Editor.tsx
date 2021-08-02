@@ -119,7 +119,6 @@ const getMarkers = (
   }));
 };
 
-
 const toggleBreakpoint = (editor: Ace.Editor, row: number) => {
   const content = editor.session.getLine(row);
   const breakpoints = editor.session.getBreakpoints();
@@ -188,7 +187,6 @@ const makeHandleGutterClick = (
   e.stop();
   handleEditorUpdateBreakpoints(e.editor.session.getBreakpoints());
 };
-
 
 
 // Note: This is untestable/unused because JS-hint has been removed.

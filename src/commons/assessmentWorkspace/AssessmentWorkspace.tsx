@@ -29,6 +29,8 @@ import {
   Assessment,
   AssessmentCategories,
   AutogradingResult,
+  ContestEntry,
+  IContestVotingQuestion,
   IMCQQuestion,
   IProgrammingQuestion,
   Library,
@@ -53,6 +55,8 @@ import { MobileSideContentProps } from '../mobileWorkspace/mobileSideContent/Mob
 import MobileWorkspace, { MobileWorkspaceProps } from '../mobileWorkspace/MobileWorkspace';
 import { SideContentProps } from '../sideContent/SideContent';
 import SideContentAutograder from '../sideContent/SideContentAutograder';
+import SideContentContestLeaderboard from '../sideContent/SideContentContestLeaderboard';
+import SideContentContestVotingContainer from '../sideContent/SideContentContestVotingContainer';
 import SideContentToneMatrix from '../sideContent/SideContentToneMatrix';
 import { SideContentTab, SideContentType } from '../sideContent/SideContentTypes';
 import SideContentVideoDisplay from '../sideContent/SideContentVideoDisplay';
@@ -66,7 +70,6 @@ import AssessmentWorkspaceGradingResult from './AssessmentWorkspaceGradingResult
 export type AssessmentWorkspaceProps = DispatchProps & StateProps & OwnProps;
 
 export type DispatchProps = {
-  handleActiveTabChange: (activeTab: SideContentType) => void;
   handleAssessmentFetch: (assessmentId: number) => void;
   handleBrowseHistoryDown: () => void;
   handleBrowseHistoryUp: () => void;
@@ -83,9 +86,10 @@ export type DispatchProps = {
   handleReplValueChange: (newValue: string) => void;
   handleSendReplInputToOutput: (code: string) => void;
   handleResetWorkspace: (options: Partial<WorkspaceState>) => void;
-  handleSave: (id: number, answer: number | string) => void;
+  handleSave: (id: number, answer: number | string | ContestEntry[]) => void;
   handleSideContentHeightChange: (heightChange: number) => void;
   handleTestcaseEval: (testcaseId: number) => void;
+  handleRunAllTestcases: () => void;
   handleUpdateCurrentAssessmentId: (assessmentId: number, questionId: number) => void;
   handleUpdateHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
   handleDebuggerPause: () => void;
@@ -128,7 +132,11 @@ const AssessmentWorkspace: React.FC<AssessmentWorkspaceProps> = props => {
   const [showOverlay, setShowOverlay] = React.useState(false);
   const [showResetTemplateOverlay, setShowResetTemplateOverlay] = React.useState(false);
   const [sessionId, setSessionId] = React.useState('');
-  const [selectedTab, setSelectedTab] = React.useState(SideContentType.questionOverview);
+  const [selectedTab, setSelectedTab] = React.useState(
+    props.assessment?.questions[props.questionId].grader !== undefined
+      ? SideContentType.grading
+      : SideContentType.questionOverview
+  );
   const isMobileBreakpoint = useMediaQuery({ maxWidth: Constants.mobileBreakpoint });
 
   React.useEffect(() => {
@@ -190,7 +198,6 @@ const AssessmentWorkspace: React.FC<AssessmentWorkspaceProps> = props => {
         selectedTab === SideContentType.mobileEditorRun)
     ) {
       setSelectedTab(SideContentType.questionOverview);
-      props.handleActiveTabChange(SideContentType.questionOverview);
     }
   }, [isMobileBreakpoint, props, selectedTab]);
 
@@ -241,8 +248,22 @@ const AssessmentWorkspace: React.FC<AssessmentWorkspaceProps> = props => {
     }
   };
 
+  /**
+   * handleEval used in both the Run button, and during 'shift-enter' in AceEditor
+   *
+   * However, AceEditor only binds commands on mount (https://github.com/securingsincity/react-ace/issues/684)
+   * Thus, we use a mutable ref to overcome the stale closure problem
+   */
+  const activeTab = React.useRef(selectedTab);
+  activeTab.current = selectedTab;
   const handleEval = () => {
     props.handleEditorEval();
+
+    // Run testcases when the autograder tab is selected
+    if (activeTab.current === SideContentType.autograder) {
+      props.handleRunAllTestcases();
+    }
+
     const input: Input = {
       time: Date.now(),
       type: 'keyboardCommand',
@@ -330,42 +351,104 @@ const AssessmentWorkspace: React.FC<AssessmentWorkspaceProps> = props => {
     questionId: number
   ) => {
     const isGraded = props.assessment!.questions[questionId].grader !== undefined;
-    const tabs: SideContentTab[] = [
-      {
-        label: `Task ${questionId + 1}`,
-        iconName: IconNames.NINJA,
-        body: (
-          <Markdown
-            className="sidecontent-overview"
-            content={props.assessment!.questions[questionId].content}
-          />
-        ),
-        id: SideContentType.questionOverview,
-        toSpawn: () => true
-      },
-      {
-        label: `${props.assessment!.category} Briefing`,
-        iconName: IconNames.BRIEFCASE,
-        body: <Markdown className="sidecontent-overview" content={props.assessment!.longSummary} />,
-        id: SideContentType.briefing,
-        toSpawn: () => true
-      },
-      {
-        label: `${props.assessment!.category} Autograder`,
-        iconName: IconNames.AIRPLANE,
-        body: (
-          <SideContentAutograder
-            testcases={props.editorTestcases}
-            autogradingResults={
-              isGraded || props.assessment!.category === 'Path' ? props.autogradingResults : []
-            }
-            handleTestcaseEval={props.handleTestcaseEval}
-          />
-        ),
-        id: SideContentType.autograder,
-        toSpawn: () => true
-      }
-    ];
+    const isContestVoting = props.assessment!.questions[questionId]?.type === 'voting';
+    const handleContestEntryClick = (_submissionId: number, answer: string) => {
+      props.handleEditorValueChange(answer);
+    };
+
+    const tabs: SideContentTab[] = isContestVoting
+      ? [
+          {
+            label: `Task ${questionId + 1}`,
+            iconName: IconNames.NINJA,
+            body: <Markdown content={props.assessment!.questions[questionId].content} />,
+            id: SideContentType.questionOverview,
+            toSpawn: () => true
+          },
+          {
+            label: `Contest Voting Briefing`,
+            iconName: IconNames.BRIEFCASE,
+            body: <Markdown content={props.assessment!.longSummary} />,
+            id: SideContentType.briefing,
+            toSpawn: () => true
+          },
+          {
+            label: 'Contest Voting',
+            iconName: IconNames.NEW_LAYERS,
+            body: (
+              <SideContentContestVotingContainer
+                canSave={props.canSave}
+                handleSave={votingSubmission =>
+                  props.handleSave(
+                    (props.assessment?.questions[questionId] as IContestVotingQuestion).id,
+                    votingSubmission
+                  )
+                }
+                handleContestEntryClick={handleContestEntryClick}
+                contestEntries={
+                  (props.assessment?.questions[questionId] as IContestVotingQuestion)
+                    ?.contestEntries ?? []
+                }
+              />
+            ),
+            id: SideContentType.contestVoting,
+            toSpawn: () => true
+          },
+          {
+            label: 'Contest Leaderboard',
+            iconName: IconNames.CROWN,
+            body: (
+              <SideContentContestLeaderboard
+                handleContestEntryClick={handleContestEntryClick}
+                orderedContestEntries={
+                  (props.assessment?.questions[questionId] as IContestVotingQuestion)
+                    ?.contestLeaderboard ?? []
+                }
+              />
+            ),
+            id: SideContentType.contestLeaderboard,
+            toSpawn: () => false
+          }
+        ]
+      : [
+          {
+            label: `Task ${questionId + 1}`,
+            iconName: IconNames.NINJA,
+            body: (
+              <Markdown
+                className="sidecontent-overview"
+                content={props.assessment!.questions[questionId].content}
+              />
+            ),
+            id: SideContentType.questionOverview,
+            toSpawn: () => true
+          },
+          {
+            label: `${props.assessment!.category} Briefing`,
+            iconName: IconNames.BRIEFCASE,
+            body: (
+              <Markdown className="sidecontent-overview" content={props.assessment!.longSummary} />
+            ),
+            id: SideContentType.briefing,
+            toSpawn: () => true
+          },
+          {
+            label: `${props.assessment!.category} Autograder`,
+            iconName: IconNames.AIRPLANE,
+            body: (
+              <SideContentAutograder
+                testcases={props.editorTestcases}
+                autogradingResults={
+                  isGraded || props.assessment!.category === 'Path' ? props.autogradingResults : []
+                }
+                handleTestcaseEval={props.handleTestcaseEval}
+              />
+            ),
+            id: SideContentType.autograder,
+            toSpawn: () => true
+          }
+        ];
+
     if (isGraded) {
       tabs.push({
         label: `Report Card`,
@@ -423,8 +506,6 @@ const AssessmentWorkspace: React.FC<AssessmentWorkspaceProps> = props => {
     };
 
     return {
-      handleActiveTabChange: props.handleActiveTabChange,
-      defaultSelectedTabId: isGraded ? SideContentType.grading : selectedTab,
       selectedTabId: selectedTab,
       tabs,
       onChange: onChangeTabs,
@@ -488,6 +569,7 @@ const AssessmentWorkspace: React.FC<AssessmentWorkspaceProps> = props => {
 
     const onClickSave = () =>
       props.handleSave(props.assessment!.questions[questionId].id, props.editorValue!);
+
     const onClickResetTemplate = () => {
       setShowResetTemplateOverlay(true);
     };
@@ -529,7 +611,8 @@ const AssessmentWorkspace: React.FC<AssessmentWorkspaceProps> = props => {
     const runButton = <ControlBarRunButton handleEditorEval={handleEval} key="run" />;
 
     const saveButton =
-      props.canSave && props.assessment!.questions[questionId].type !== QuestionTypes.mcq ? (
+      props.canSave &&
+      props.assessment!.questions[questionId].type === QuestionTypes.programming ? (
         <ControlButtonSaveButton
           hasUnsavedChanges={props.hasUnsavedChanges}
           onClickSave={onClickSave}
@@ -670,12 +753,15 @@ const AssessmentWorkspace: React.FC<AssessmentWorkspaceProps> = props => {
       : props.questionId;
   const question: Question = props.assessment.questions[questionId];
   const editorProps =
-    question.type === QuestionTypes.programming
+    question.type === QuestionTypes.programming || question.type === QuestionTypes.voting
       ? {
           editorSessionId: '',
           editorValue: props.editorValue!,
+          sourceChapter: question.library.chapter || 4,
+          sourceVariant: 'default' as Variant,
+          externalLibrary: question.library.external.name || 'NONE',
           handleDeclarationNavigate: props.handleDeclarationNavigate,
-          handleEditorEval: props.handleEditorEval,
+          handleEditorEval: handleEval,
           handleEditorValueChange: props.handleEditorValueChange,
           handleUpdateHasUnsavedChanges: props.handleUpdateHasUnsavedChanges,
           breakpoints: props.breakpoints,

@@ -3,6 +3,7 @@ import { History } from 'history';
 import { throttle } from 'lodash';
 import { applyMiddleware, compose, createStore as _createStore } from 'redux';
 import createSagaMiddleware from 'redux-saga';
+import { generateOctokitInstance } from 'src/commons/utils/GitHubPersistenceHelper';
 
 import { defaultState } from '../commons/application/ApplicationTypes';
 import createRootReducer from '../commons/application/reducers/RootReducer';
@@ -27,7 +28,7 @@ export function createStore(history: History) {
 
   const enhancers = composeEnhancers(applyMiddleware(...middleware));
 
-  const createdStore = _createStore(createRootReducer(history), initialStore, enhancers);
+  const createdStore = _createStore(createRootReducer(history), initialStore as any, enhancers);
   sagaMiddleware.run(MainSaga);
 
   createdStore.subscribe(
@@ -47,7 +48,12 @@ function loadStore(loadedStore: SavedState | undefined) {
     ...defaultState,
     session: {
       ...defaultState.session,
-      ...(loadedStore.session ? loadedStore.session : {})
+      ...(loadedStore.session ? loadedStore.session : {}),
+      githubOctokitObject: {
+        octokit: loadedStore.session.githubAccessToken
+          ? generateOctokitInstance(loadedStore.session.githubAccessToken)
+          : undefined
+      }
     },
     workspaces: {
       ...defaultState.workspaces,
