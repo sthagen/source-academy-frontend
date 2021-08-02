@@ -297,6 +297,10 @@ function* BackendSaga(): SagaIterator {
     const grading: Grading = yield select((state: OverallState) =>
       state.session.gradings.get(submissionId)
     );
+    const { name, id } = yield select((state: OverallState) => ({
+      name: state.session.name,
+      id: state.session.userId
+    }));
     const newGrading = grading.slice().map((gradingQuestion: GradingQuestion) => {
       if (gradingQuestion.question.id === questionId) {
         gradingQuestion.grade = {
@@ -304,7 +308,12 @@ function* BackendSaga(): SagaIterator {
           xpAdjustment,
           grade: gradingQuestion.grade.grade,
           xp: gradingQuestion.grade.xp,
-          comments
+          // Used to detect that grading is complete.
+          grader: {
+            name,
+            id,
+          },
+          gradedAt: (new Date()).toISOString()
         };
       }
       return gradingQuestion;
