@@ -461,7 +461,8 @@ const AssessmentWorkspace: React.FC<AssessmentWorkspaceProps> = props => {
             grade={props.assessment!.questions[questionId].grade}
             maxGrade={props.assessment!.questions[questionId].maxGrade}
             maxXp={props.assessment!.questions[questionId].maxXp}
-            comments={props.assessment!.questions[questionId].comments}
+            assessmentId={props.assessmentId}
+            questionId={props.questionId}
           />
         ),
         id: SideContentType.grading,

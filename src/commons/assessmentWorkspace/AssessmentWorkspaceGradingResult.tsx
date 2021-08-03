@@ -1,7 +1,7 @@
-import { Divider, HTMLTable, Text } from '@blueprintjs/core';
+import { HTMLTable, Text } from '@blueprintjs/core';
 import * as React from 'react';
 
-import Markdown from '../Markdown';
+import CommentsOnLine from '../editor/CommentsOnLine';
 import { getPrettyDate } from '../utils/DateHelper';
 
 type AssessmentWorkspaceGradingResultProps = StateProps;
@@ -13,7 +13,8 @@ type StateProps = {
   grade: number;
   maxGrade: number;
   maxXp: number;
-  comments?: string;
+  assessmentId: number;
+  questionId: number;
 };
 
 class AssessmentWorkspaceGradingResult extends React.Component<
@@ -46,30 +47,20 @@ class AssessmentWorkspaceGradingResult extends React.Component<
 
               <tr>
                 <th>Comments:</th>
-                <td>{!this.props.comments && <Text>None</Text>}</td>
+                <td>
+                  {/* Would like to put it here, but it's ugly */}
+                </td>
               </tr>
             </tbody>
           </HTMLTable>
 
-          {this.props.comments && (
-            <HTMLTable>
-              <tbody>
-                <tr>
-                  <td>
-                    <Divider />
-                    <Markdown
-                      content={this.props.comments}
-                      simplifiedAutoLink={true}
-                      strikethrough={true}
-                      tasklists={true}
-                      openLinksInNewWindow={true}
-                    />
-                    <Divider />
-                  </td>
-                </tr>
-              </tbody>
-            </HTMLTable>
-          )}
+          {<CommentsOnLine 
+              assessmentId={this.props.assessmentId}
+              questionId={this.props.questionId}
+              lineNum={-1}
+              showAddComment={true}
+            ></CommentsOnLine>
+          }
 
           <br />
 
