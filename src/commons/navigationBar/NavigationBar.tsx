@@ -286,7 +286,7 @@ const NavigationBar: React.FC<NavigationBarProps> = props => {
         <NavbarDivider className="default-divider" />
       </div>
 
-      <Dropdown handleLogOut={props.handleLogOut} name={props.name} profilePic={props.profilePic}/>
+      <Dropdown handleLogOut={props.handleLogOut} name={props.name} profilePic={props.profilePic} />
     </NavbarGroup>
   );
 

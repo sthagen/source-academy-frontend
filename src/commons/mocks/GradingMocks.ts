@@ -199,9 +199,11 @@ function remainder(n, d) {
       name: 'Al Gorithm',
       id: 0
     },
-    comments: { "-1": 
-      [makeMockComment(-1, 
-        `Good job. You are awarded the full marks!
+    comments: {
+      '-1': [
+        makeMockComment(
+          -1,
+          `Good job. You are awarded the full marks!
 
         ----
         ## markdown test
@@ -225,8 +227,10 @@ function remainder(n, d) {
         [link to Source Academy](https://sourceacademy.nus.edu.sg)
         
         ![](image-url-goes-here)
-      `)]
-    },
+      `
+        )
+      ]
+    }
   },
   {
     question: {
@@ -279,10 +283,13 @@ function remainder(n, d) {
       gradeAdjustment: 0,
       xpAdjustment: 0,
       grade: 100,
-      xp: 100,
+      xp: 100
     },
     comments: {
-      "-1": [makeMockComment(-1, `You open the Report Card, not knowing what to expect...
+      '-1': [
+        makeMockComment(
+          -1,
+          `You open the Report Card, not knowing what to expect...
 
       ## WOW!
       Amazing grasp of runes. We can now move on to the next assignment.
@@ -316,7 +323,9 @@ function remainder(n, d) {
       #### Upcoming Tasks
       - [] Meet Avenger Avenger at Level X-05
       - [] Open the Pod Bay Doors
-            `)]
+            `
+        )
+      ]
     },
     student: {
       name: 'Al Gorithm',

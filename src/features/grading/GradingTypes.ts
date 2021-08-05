@@ -1,4 +1,4 @@
-import {  IComments } from 'src/commons/editor/EditorTypes';
+import { IComments } from 'src/commons/editor/EditorTypes';
 
 import {
   AssessmentCategory,

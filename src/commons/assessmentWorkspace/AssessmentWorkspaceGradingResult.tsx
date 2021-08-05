@@ -47,14 +47,13 @@ class AssessmentWorkspaceGradingResult extends React.Component<
 
               <tr>
                 <th>Comments:</th>
-                <td>
-                  {/* Would like to put it here, but it's ugly */}
-                </td>
+                <td>{/* Would like to put it here, but it's ugly */}</td>
               </tr>
             </tbody>
           </HTMLTable>
 
-          {<CommentsOnLine 
+          {
+            <CommentsOnLine
               assessmentId={this.props.assessmentId}
               questionId={this.props.questionId}
               lineNum={-1}

@@ -431,12 +431,12 @@ export const mockAssessmentQuestions: Array<IProgrammingQuestion | IMCQQuestion>
 export function makeMockComment(lineNo: number, text: string): IComment {
   return {
     profilePic: '/profiles/123.png',
-    userId: "1",
-    id: "1",
-    username: "test user",
+    userId: '1',
+    id: '1',
+    username: 'test user',
     linenum: lineNo,
     text,
-    datetime: (new Date(2020, 8, 8)).getTime(),
+    datetime: new Date(2020, 8, 8).getTime(),
     meta: {
       isCollapsed: false
     }
@@ -490,8 +490,11 @@ export const mockClosedAssessmentQuestions: Array<IProgrammingQuestion | IMCQQue
     grade: 0,
     maxGrade: 2,
     maxXp: 2,
-    comments: { '-1': 
-      [makeMockComment(-1, `Good job. You are awarded the full marks!
+    comments: {
+      '-1': [
+        makeMockComment(
+          -1,
+          `Good job. You are awarded the full marks!
     
       ----
       ## markdown test
@@ -514,7 +517,9 @@ export const mockClosedAssessmentQuestions: Array<IProgrammingQuestion | IMCQQue
       
       [link to Source Academy](https://sourceacademy.nus.edu.sg)  
       
-      ![](image-url-goes-here)`)]
+      ![](image-url-goes-here)`
+        )
+      ]
     },
     autogradingResults: [
       {
@@ -566,7 +571,10 @@ export const mockClosedAssessmentQuestions: Array<IProgrammingQuestion | IMCQQue
     maxGrade: 2,
     maxXp: 2,
     comments: {
-      "-1": [makeMockComment(-1, `You open the Report Card, not knowing what to expect...
+      '-1': [
+        makeMockComment(
+          -1,
+          `You open the Report Card, not knowing what to expect...
   
       ## WOW!
       Amazing grasp of runes. We can now move on to the next assignment.
@@ -599,7 +607,9 @@ export const mockClosedAssessmentQuestions: Array<IProgrammingQuestion | IMCQQue
       
       #### Upcoming Tasks
       - [] Meet Avenger Avenger at Level X-05
-      - [] Open the Pod Bay Doors`)]
+      - [] Open the Pod Bay Doors`
+        )
+      ]
     },
     autogradingResults: []
   }

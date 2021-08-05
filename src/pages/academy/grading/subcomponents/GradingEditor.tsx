@@ -1,12 +1,4 @@
-import {
-  Button,
-  Divider,
-  H3,
-  Intent,
-  NumericInput,
-  Position,
-  Pre
-} from '@blueprintjs/core';
+import { Button, Divider, H3, Intent, NumericInput, Position, Pre } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import * as React from 'react';
 import { ReactMdeProps } from 'react-mde';
@@ -42,7 +34,7 @@ export type DispatchProps = {
 type OwnProps = {
   solution: number | string | null;
   questionId: number; // grading![questionId].question.id
-  realQuestionId: number; //just the questionId 
+  realQuestionId: number; //just the questionId
   submissionId: number;
   initialGrade: number;
   gradeAdjustment: number;
@@ -100,7 +92,6 @@ class GradingEditor extends React.Component<GradingEditorProps, State> {
     super(props);
     this.state = this.makeInitialState();
   }
-
 
   public render() {
     const hasUnsavedChanges = this.hasUnsavedChanges();
@@ -227,7 +218,7 @@ class GradingEditor extends React.Component<GradingEditorProps, State> {
           </div>
         </div>
 
-        <CommentsOnLine 
+        <CommentsOnLine
           submissionId={this.props.submissionId}
           questionId={this.props.realQuestionId}
           lineNum={-1}
@@ -366,7 +357,7 @@ class GradingEditor extends React.Component<GradingEditorProps, State> {
         {
           ...this.state,
           gradeAdjustmentInput: this.props.gradeAdjustment!.toString(),
-          xpAdjustmentInput: this.props.xpAdjustment!.toString(),
+          xpAdjustmentInput: this.props.xpAdjustment!.toString()
           //TODO: re-implement the editor text box editorValue: this.props.comments || ''
         },
         () => {
@@ -405,17 +396,15 @@ class GradingEditor extends React.Component<GradingEditorProps, State> {
     });
   };
 
-
   private hasUnsavedChanges = () => {
     const gradeAdjustmentInput = stringParamToInt(this.state.gradeAdjustmentInput || undefined);
     const xpAdjustmentInput = stringParamToInt(this.state.xpAdjustmentInput || undefined);
-    console.log(this.props.gradedAt, this.props.graderName)
+    console.log(this.props.gradedAt, this.props.graderName);
     return (
       this.props.gradeAdjustment !== gradeAdjustmentInput ||
       this.props.xpAdjustment !== xpAdjustmentInput
     );
   };
-
 
   private makeInitialState(): State {
     return {

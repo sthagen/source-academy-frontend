@@ -67,7 +67,6 @@ export type SessionStateBase = {
   readonly remoteExecutionSession?: DeviceSession;
 };
 
-
 export type Tokens = {
   accessToken: string;
   refreshToken: string;

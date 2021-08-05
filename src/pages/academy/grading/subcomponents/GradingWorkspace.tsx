@@ -200,7 +200,7 @@ class GradingWorkspace extends React.Component<GradingWorkspaceProps, State> {
               sourceVariant: 'default',
               externalLibraryName: question?.library?.external?.name || 'NONE',
               submissionId: this.props.submissionId,
-              questionId: this.props.questionId,
+              questionId: this.props.questionId
             }
           : undefined,
       editorHeight: this.props.editorHeight,
@@ -290,7 +290,7 @@ class GradingWorkspace extends React.Component<GradingWorkspaceProps, State> {
     props: GradingWorkspaceProps,
     questionId: number
   ) => {
-    console.log('Re-render side content', props.grading![questionId].grade.grader)
+    console.log('Re-render side content', props.grading![questionId].grade.grader);
     const tabs: SideContentTab[] = [
       {
         label: `Grading: Question ${questionId + 1}`,

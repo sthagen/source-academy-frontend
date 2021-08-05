@@ -251,7 +251,7 @@ test('submitGrading generates correct action object', () => {
       submissionId,
       questionId,
       gradeAdjustment,
-      xpAdjustment,
+      xpAdjustment
     }
   });
 });
@@ -261,19 +261,14 @@ test('submitGradingAndContinue generates correct action object', () => {
   const questionId = 7;
   const gradeAdjustment = 90;
   const xpAdjustment = 55;
-  const action = submitGradingAndContinue(
-    submissionId,
-    questionId,
-    gradeAdjustment,
-    xpAdjustment,
-  );
+  const action = submitGradingAndContinue(submissionId, questionId, gradeAdjustment, xpAdjustment);
   expect(action).toEqual({
     type: SUBMIT_GRADING_AND_CONTINUE,
     payload: {
       submissionId,
       questionId,
       gradeAdjustment,
-      xpAdjustment,
+      xpAdjustment
     }
   });
 });

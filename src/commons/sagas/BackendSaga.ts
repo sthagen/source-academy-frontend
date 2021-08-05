@@ -310,9 +310,9 @@ function* BackendSaga(): SagaIterator {
           // Used to detect that grading is complete.
           grader: {
             name,
-            id,
+            id
           },
-          gradedAt: (new Date()).toISOString()
+          gradedAt: new Date().toISOString()
         };
       }
       return gradingQuestion;

@@ -59,16 +59,15 @@ div.#{$ns}-dialog.help {
           top: 0;
           right: 0;
           padding: 0.25em;
-          color: rgb(25,25,25,0.65);
-          background-color: rgb(120,120,120,0.5);
-          
+          color: rgb(25, 25, 25, 0.65);
+          background-color: rgb(120, 120, 120, 0.5);
+
           &:hover {
-            background-color: rgb(200,200,200,0.9);
-            color: rgb(25,25,25,1);
+            background-color: rgb(200, 200, 200, 0.9);
+            color: rgb(25, 25, 25, 1);
           }
         }
       }
-      
 
       .profile-username {
         padding-left: 2em;
@@ -236,7 +235,6 @@ div.#{$ns}-dialog.help {
     }
   }
 }
-
 
 .profile-image-mini {
   width: 1.3em;

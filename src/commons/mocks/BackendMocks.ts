@@ -153,7 +153,7 @@ export function* mockBackendSaga(): SagaIterator {
           gradeAdjustment,
           xpAdjustment,
           grade: gradingQuestion.grade.grade,
-          xp: gradingQuestion.grade.xp,
+          xp: gradingQuestion.grade.xp
         };
       }
       return gradingQuestion;

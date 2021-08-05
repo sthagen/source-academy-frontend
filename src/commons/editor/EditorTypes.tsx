@@ -40,7 +40,6 @@ export interface IAutocompletionResult {
 
 export type HighlightedLines = [number, number]; // Start line, end line.
 
-
 // ------------ Comments --------------
 
 // This is the data that's sent around.
@@ -67,5 +66,4 @@ export interface ICommentMeta {
   error?: string;
 }
 
-export type IComments = { [lineNo: number]: IComment[] }
-
+export type IComments = { [lineNo: number]: IComment[] };

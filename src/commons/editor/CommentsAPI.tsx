@@ -1,6 +1,6 @@
 import { find } from 'lodash';
 import * as React from 'react';
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from 'react-redux';
 import { v1 as uuidv1 } from 'uuid';
 
 import { OverallState } from '../application/ApplicationTypes';
@@ -18,8 +18,8 @@ import { CommentsStateProps } from './UseComments';
 export type { IComment, IComments } from './EditorTypes';
 
 export interface CommentAPI {
-  comments: IComments,
-  loadComments: (assessmentId: string) => Promise<IComments>,
+  comments: IComments;
+  loadComments: (assessmentId: string) => Promise<IComments>;
   createEmptyComment: (row: number) => void;
   updateComment: (comment: IComment) => void;
   removeComment: (comment: IComment) => void;
@@ -62,7 +62,7 @@ export interface CommentAPI {
 // userId: string;
 // linenum: number;
 // text: string;
-// datetime: number; 
+// datetime: number;
 
 interface StateProps {
   userId?: number;
@@ -74,54 +74,64 @@ const NO_COMMENTS = {} as IComments;
 
 // This is because this is a self-contained abstraction which is meant to be loaded into components.
 export function useComments(props: CommentsStateProps): CommentAPI {
-
   const { questionId, assessmentId, submissionId, disableComments } = props;
   // if assessmentId -> load/store data from state.sessions.assessments.get(assessmentId)
   // if submissionId -> load/store data from state.sessions.gradings.get(submissionId)
 
   // const [comments, setComments] = React.useState({} as { [id: string]: IComment });
-  const comments = useSelector<OverallState, IComments | undefined>((state) => {
-    if (props.assessmentId !== undefined) {
-      return state.session.assessments.get(assessmentId!)?.questions[questionId!].comments;
-    } else if (submissionId !== undefined) {
-      return state.session.gradings.get(submissionId)![questionId!].comments;
-    }
-    return NO_COMMENTS;
-  }) || NO_COMMENTS; // Prevent creation of new 
+  const comments =
+    useSelector<OverallState, IComments | undefined>(state => {
+      if (props.assessmentId !== undefined) {
+        return state.session.assessments.get(assessmentId!)?.questions[questionId!].comments;
+      } else if (submissionId !== undefined) {
+        return state.session.gradings.get(submissionId)![questionId!].comments;
+      }
+      return NO_COMMENTS;
+    }) || NO_COMMENTS; // Prevent creation of new
   // @ts-ignore
   const isDisabled = disableComments || (assessmentId === undefined && submissionId === undefined);
   const dispatch = useDispatch();
   // Raw API, purely adjusts data, nothing related to network.
   // Note: All comments should be on the same line!
   // There should be at least 1 comment!
-  const updateCommentRaw = React.useCallback((...comments: IComment[]) => {
-    if (assessmentId !== undefined) {
-      dispatch(updateCommentsAssessment(assessmentId, questionId!, comments[0].linenum, comments));
-    } else if (submissionId !== undefined) {
-      dispatch(updateCommentsSubmission(submissionId, questionId!, comments[0].linenum, comments));
-    }
-  }, [assessmentId, dispatch, questionId, submissionId]);
+  const updateCommentRaw = React.useCallback(
+    (...comments: IComment[]) => {
+      if (assessmentId !== undefined) {
+        dispatch(
+          updateCommentsAssessment(assessmentId, questionId!, comments[0].linenum, comments)
+        );
+      } else if (submissionId !== undefined) {
+        dispatch(
+          updateCommentsSubmission(submissionId, questionId!, comments[0].linenum, comments)
+        );
+      }
+    },
+    [assessmentId, dispatch, questionId, submissionId]
+  );
 
-  const addCommentRaw = React.useCallback((comment: IComment) => {
-    if (assessmentId !== undefined) {
-      console.log('addCommentAss')
-      dispatch(addCommentAssessment(assessmentId, questionId!, comment.linenum, comment));
-    } else if (submissionId !== undefined) {
-      console.log('addCommentSub')
-      dispatch(addCommentSubmission(submissionId, questionId!, comment.linenum, comment));
-    }
-  }, [assessmentId, dispatch, questionId, submissionId])
+  const addCommentRaw = React.useCallback(
+    (comment: IComment) => {
+      if (assessmentId !== undefined) {
+        console.log('addCommentAss');
+        dispatch(addCommentAssessment(assessmentId, questionId!, comment.linenum, comment));
+      } else if (submissionId !== undefined) {
+        console.log('addCommentSub');
+        dispatch(addCommentSubmission(submissionId, questionId!, comment.linenum, comment));
+      }
+    },
+    [assessmentId, dispatch, questionId, submissionId]
+  );
 
-
-  const removeCommentRaw = React.useCallback((comment: IComment) => {
-    if (assessmentId !== undefined) {
-      dispatch(removeCommentAssessment(assessmentId, questionId!, comment.linenum, comment.id))
-    } else if (submissionId !== undefined) {
-      dispatch(removeCommentSubmission(submissionId, questionId!, comment.linenum, comment.id))
-
-    }
-  }, [assessmentId, dispatch, questionId, submissionId])
-
+  const removeCommentRaw = React.useCallback(
+    (comment: IComment) => {
+      if (assessmentId !== undefined) {
+        dispatch(removeCommentAssessment(assessmentId, questionId!, comment.linenum, comment.id));
+      } else if (submissionId !== undefined) {
+        dispatch(removeCommentSubmission(submissionId, questionId!, comment.linenum, comment.id));
+      }
+    },
+    [assessmentId, dispatch, questionId, submissionId]
+  );
 
   // const [comments, setComments] = React.useState({} as { [id: string]: IComment });
   const { name, userId, profilePic } = useSelector<OverallState, StateProps>(state => ({
@@ -142,18 +152,21 @@ export function useComments(props: CommentsStateProps): CommentAPI {
   // );
 
   // STUB FUNCTION
-  const loadComments: (assessmentId: string) => Promise<IComments> =
-    React.useCallback(
-      (assessmentId: string) =>
-        new Promise((resolve, reject) => {
-          if (Math.random() < 0.5) {
-            setTimeout(() => resolve(comments), 1000);
-          } else {
-            setTimeout(() => reject('(Test error message) Some error occured, please try again'), 1000);
-          }
-        })
+  const loadComments: (assessmentId: string) => Promise<IComments> = React.useCallback(
+    (assessmentId: string) =>
+      new Promise((resolve, reject) => {
+        if (Math.random() < 0.5) {
+          setTimeout(() => resolve(comments), 1000);
+        } else {
+          setTimeout(
+            () => reject('(Test error message) Some error occured, please try again'),
+            1000
+          );
+        }
+      }),
 
-      , [comments]);
+    [comments]
+  );
 
   // TODO: update details accordingly.
   const createEmptyComment = React.useCallback(
@@ -161,7 +174,7 @@ export function useComments(props: CommentsStateProps): CommentAPI {
       const id = uuidv1();
       const newComment: IComment = {
         id,
-        userId: "" + userId,
+        userId: '' + userId,
         username: name!,
         profilePic: profilePic!,
         linenum: row,
@@ -170,7 +183,7 @@ export function useComments(props: CommentsStateProps): CommentAPI {
         // Not submitted yet!
         // Will sort to the end.
         meta: {
-          isCollapsed: false,
+          isCollapsed: false
         }
       };
       newComment.meta.editing = newComment; // set to editing by default
@@ -185,18 +198,19 @@ export function useComments(props: CommentsStateProps): CommentAPI {
   const updateComment = React.useCallback(
     (comment: IComment) => {
       const original = find(comments[comment.linenum], c => c.id === comment.id)!;
-      if(!original.meta.editing) {
+      if (!original.meta.editing) {
         updateCommentRaw(comment);
-      }  else {
+      } else {
         updateCommentRaw({
           ...original,
           meta: {
             ...original.meta,
-            editing: comment,
+            editing: comment
           }
-        })
+        });
       }
-    }, [comments, updateCommentRaw]
+    },
+    [comments, updateCommentRaw]
   );
 
   const removeComment = React.useCallback(
@@ -212,10 +226,11 @@ export function useComments(props: CommentsStateProps): CommentAPI {
         ...comment,
         meta: {
           ...comment.meta,
-          editing: comment,
+          editing: comment
         }
-      })
-    }, [updateCommentRaw]
+      });
+    },
+    [updateCommentRaw]
   );
 
   const cancelEdit = React.useCallback(
@@ -224,10 +239,11 @@ export function useComments(props: CommentsStateProps): CommentAPI {
         ...comment,
         meta: {
           ...comment.meta,
-          editing: undefined,
+          editing: undefined
         }
-      })
-    }, [updateCommentRaw]
+      });
+    },
+    [updateCommentRaw]
   );
 
   // Replaces the comment with the edited variant.
@@ -238,41 +254,44 @@ export function useComments(props: CommentsStateProps): CommentAPI {
         ...comment.meta.editing!,
         meta: {
           ...comment.meta,
-          editing: undefined,
+          editing: undefined
         }
       });
-    }, [updateCommentRaw]
-  )
-
+    },
+    [updateCommentRaw]
+  );
 
   const collapseComment = React.useCallback(
     (...comments: IComment[]) => {
-      updateCommentRaw(...comments.map(c => ({
-        ...c,
-        meta: {
-          ...c.meta,
-          isCollapsed: true
-        }
-      })));
-    }, [updateCommentRaw]
-  )
+      updateCommentRaw(
+        ...comments.map(c => ({
+          ...c,
+          meta: {
+            ...c.meta,
+            isCollapsed: true
+          }
+        }))
+      );
+    },
+    [updateCommentRaw]
+  );
 
   const expandComment = React.useCallback(
     (...comments: IComment[]) => {
-      updateCommentRaw(...comments.map(c => ({
-        ...c,
-        meta: {
-          ...c.meta,
-          isCollapsed: false
-        }
-      })));
-    }, [updateCommentRaw]
-  )
+      updateCommentRaw(
+        ...comments.map(c => ({
+          ...c,
+          meta: {
+            ...c.meta,
+            isCollapsed: false
+          }
+        }))
+      );
+    },
+    [updateCommentRaw]
+  );
 
-  const isUnsubmittedComment = (comment: IComment) =>
-    comment.datetime === Infinity;
-
-
+  const isUnsubmittedComment = (comment: IComment) => comment.datetime === Infinity;
 
   return {
     comments,

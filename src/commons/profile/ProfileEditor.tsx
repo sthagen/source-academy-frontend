@@ -1,15 +1,15 @@
 import { FileInput, Slider } from '@blueprintjs/core';
-import React from 'react'
-import ReactAvatarEditor from 'react-avatar-editor'
-import Dropzone from 'react-dropzone'
+import React from 'react';
+import ReactAvatarEditor from 'react-avatar-editor';
+import Dropzone from 'react-dropzone';
 
 type ProfileEditorProps = OwnProps;
 
 type OwnProps = {
   defaultImage?: string;
-}
+};
 
-export default class ProfileEditor extends React.Component<ProfileEditorProps,{}> {
+export default class ProfileEditor extends React.Component<ProfileEditorProps, {}> {
   editor?: ReactAvatarEditor = undefined;
   state = {
     image: '',
@@ -24,52 +24,49 @@ export default class ProfileEditor extends React.Component<ProfileEditorProps,{}
     isTransparent: false,
     backgroundColor: undefined,
     zoomMax: 4
-  }
+  };
 
   public componentDidMount() {
-    if(this.props.defaultImage) {
-      this.setState({image: this.props.defaultImage});
+    if (this.props.defaultImage) {
+      this.setState({ image: this.props.defaultImage });
     }
   }
 
   // handleNewImage = (e: { target: { files: any[] } }) => {
   handleNewImage: React.FormEventHandler<HTMLInputElement> = (e: any) => {
-    this.setState({ image: e.target.files[0] })
-  }
+    this.setState({ image: e.target.files[0] });
+  };
 
   public getImg = () => {
-    const img = this.editor!.getImageScaledToCanvas().toDataURL()
+    const img = this.editor!.getImageScaledToCanvas().toDataURL();
     return img;
-  }
+  };
 
   handleScale = (val: number) => {
-    this.setState({ scale: val })
-  }
+    this.setState({ scale: val });
+  };
 
   setEditorRef = (editor: ReactAvatarEditor) => {
-    if (editor) this.editor = editor
-  }
+    if (editor) this.editor = editor;
+  };
 
-  handlePositionChange = (position: {x: number, y: number}) => {
-    this.setState({ position })
-  }
+  handlePositionChange = (position: { x: number; y: number }) => {
+    this.setState({ position });
+  };
 
   handleZoom = (event: any) => {
     event.preventDefault();
     this.setState({
-      scale: Math.min(this.state.zoomMax,
-        Math.max(this.state.scale + event.deltaY * -0.0025, 1))
-    })
-  }
+      scale: Math.min(this.state.zoomMax, Math.max(this.state.scale + event.deltaY * -0.0025, 1))
+    });
+  };
 
   render() {
     return (
-      <div
-        onWheel={this.handleZoom}
-        className="profile-editor">
+      <div onWheel={this.handleZoom} className="profile-editor">
         <Dropzone
-          onDrop={(acceptedFiles) => {
-            this.setState({ image: acceptedFiles[0] })
+          onDrop={acceptedFiles => {
+            this.setState({ image: acceptedFiles[0] });
           }}
           noClick
           multiple={false}
@@ -87,11 +84,13 @@ export default class ProfileEditor extends React.Component<ProfileEditorProps,{}
                 borderRadius={this.state.width / (100 / this.state.borderRadius)}
                 image={this.state.image}
                 className="editor-canvas"
-                crossOrigin= "anonymous"
-               />
+                crossOrigin="anonymous"
+              />
               <br />
-              <FileInput text="Choose file..." 
-                onInputChange={(files) => this.handleNewImage(files)} />
+              <FileInput
+                text="Choose file..."
+                onInputChange={files => this.handleNewImage(files)}
+              />
             </div>
           )}
         </Dropzone>
@@ -106,6 +105,6 @@ export default class ProfileEditor extends React.Component<ProfileEditorProps,{}
           />
         </div>
       </div>
-    )
+    );
   }
 }

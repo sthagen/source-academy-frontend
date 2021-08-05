@@ -57,9 +57,13 @@ class Dropdown extends React.Component<DropdownProps, State> {
   private menu(props: DropdownProps) {
     const profile = this.props.name ? (
       <MenuItem
-        icon={this.props.profilePic ? 
-          <img className='profile-image-mini' src={this.props.profilePic} alt='profile-mini'/>
-          : IconNames.USER}
+        icon={
+          this.props.profilePic ? (
+            <img className="profile-image-mini" src={this.props.profilePic} alt="profile-mini" />
+          ) : (
+            IconNames.USER
+          )
+        }
         onClick={this.toggleProfileOpen}
         text={titleCase(this.props.name)}
       />

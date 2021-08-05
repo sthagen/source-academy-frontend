@@ -552,16 +552,17 @@ export const getGradingOverviews = async (
     );
 };
 
-
 // TODO: Implement the actual thing
 // The current comments are simply a single string.
 // In the future need to just fill in the meta fields.
 function mockProcessComments(currComments?: string): IComments {
-  if(!currComments) { return {}; }
-  return {
-    "-1": [makeMockComment(-1, currComments)],
-    "0": [makeMockComment(0, 'This is a test inline comment')]
+  if (!currComments) {
+    return {};
   }
+  return {
+    '-1': [makeMockComment(-1, currComments)],
+    '0': [makeMockComment(0, 'This is a test inline comment')]
+  };
 }
 
 /**
@@ -602,7 +603,7 @@ export const getGrading = async (submissionId: number, tokens: Tokens): Promise<
         grade: grade.grade,
         xp: grade.xp,
         gradeAdjustment: grade.adjustment,
-        xpAdjustment: grade.xpAdjustment,
+        xpAdjustment: grade.xpAdjustment
       },
       comments: mockProcessComments(grade.comments)
     } as GradingQuestion;
@@ -626,14 +627,14 @@ export const postGrading = async (
   questionId: number,
   gradeAdjustment: number,
   xpAdjustment: number,
-  tokens: Tokens,
+  tokens: Tokens
 ): Promise<Response | null> => {
   const resp = await request(`admin/grading/${submissionId}/${questionId}`, 'POST', {
     ...tokens,
     body: {
       grading: {
         adjustment: gradeAdjustment,
-        xpAdjustment,
+        xpAdjustment
       }
     },
     noHeaderAccept: true,

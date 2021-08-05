@@ -1,4 +1,14 @@
-import { AnchorButton, Button, Classes, Dialog, Drawer, Icon, Intent, NonIdealState, Spinner } from '@blueprintjs/core';
+import {
+  AnchorButton,
+  Button,
+  Classes,
+  Dialog,
+  Drawer,
+  Icon,
+  Intent,
+  NonIdealState,
+  Spinner
+} from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { Tooltip2 } from '@blueprintjs/popover2';
 import * as React from 'react';
@@ -59,8 +69,8 @@ class Profile extends React.Component<ProfileProps, LocalState> {
 
   public setEditing(value: boolean) {
     this.setState({
-      editing: value,
-    })
+      editing: value
+    });
   }
 
   public async confirmCancel() {
@@ -73,7 +83,7 @@ class Profile extends React.Component<ProfileProps, LocalState> {
     if (confirm) {
       this.setState({
         editing: false
-      })
+      });
     }
   }
 
@@ -81,15 +91,12 @@ class Profile extends React.Component<ProfileProps, LocalState> {
     const img = this.profileEditorRef.current?.getImg();
     console.log(img);
     // const { accessToken, refreshToken } = store.getState().session;
-    
+
     // await request(`/user/profile_image`, 'PUT',{
     //   body: img!,
-    //   accessToken: 
+    //   accessToken:
     // })
   }
-
-
-
 
   public render() {
     const isLoaded = this.props.name && this.props.role && this.props.assessmentOverviews;
@@ -103,20 +110,21 @@ class Profile extends React.Component<ProfileProps, LocalState> {
         item => item.status === AssessmentStatuses.submitted
       ).length;
 
-      const userDetails =  
+      const userDetails = (
         <div className="profile-header">
           <div className="profile-image-container">
             <img className="profile-image" src={this.props.profilePic} alt="profile"></img>
             <div className="profile-image-edit-button" onClick={() => this.setEditing(true)}>
-              <Icon  icon="edit" />
+              <Icon icon="edit" />
             </div>
           </div>
-          
+
           <div className="profile-username">
             <div className="name">{this.props.name}</div>
             <div className="role">{this.props.role}</div>
           </div>
         </div>
+      );
 
       if (numClosed === 0) {
         content = (
@@ -232,8 +240,10 @@ class Profile extends React.Component<ProfileProps, LocalState> {
       }
     }
 
-    const userProfilePic = <img className='profile-image-mini' src={this.props.profilePic} alt='profile-mini'/>
-    const profileEditorDialog = 
+    const userProfilePic = (
+      <img className="profile-image-mini" src={this.props.profilePic} alt="profile-mini" />
+    );
+    const profileEditorDialog = (
       <Dialog
         icon={IconNames.ERROR}
         isCloseButtonShown={true}
@@ -242,30 +252,26 @@ class Profile extends React.Component<ProfileProps, LocalState> {
         title="Edit Profile Picture"
       >
         <div className={Classes.DIALOG_BODY}>
-          <ProfileEditor
-            defaultImage="https://picsum.photos/500/700"
-            ref={this.profileEditorRef}
-          />
+          <ProfileEditor defaultImage="https://picsum.photos/500/700" ref={this.profileEditorRef} />
         </div>
         <div className={Classes.DIALOG_FOOTER}>
-            <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-                <Tooltip2 content="This button is hooked up to close the dialog.">
-                    <Button 
-                      icon="cross"
-                      intent={Intent.DANGER}
-                      onClick={ () => this.confirmCancel() }
-                    >Cancel</Button>
-                </Tooltip2>
-                <AnchorButton
-                    onClick={ () => this.saveImage()}
-                    icon="floppy-disk"
-                    intent={Intent.PRIMARY}
-                >
-                    Save
-                </AnchorButton>
-            </div>
+          <div className={Classes.DIALOG_FOOTER_ACTIONS}>
+            <Tooltip2 content="This button is hooked up to close the dialog.">
+              <Button icon="cross" intent={Intent.DANGER} onClick={() => this.confirmCancel()}>
+                Cancel
+              </Button>
+            </Tooltip2>
+            <AnchorButton
+              onClick={() => this.saveImage()}
+              icon="floppy-disk"
+              intent={Intent.PRIMARY}
+            >
+              Save
+            </AnchorButton>
+          </div>
         </div>
       </Dialog>
+    );
     return (
       <Drawer
         className="profile"

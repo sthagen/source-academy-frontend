@@ -153,8 +153,6 @@ const toggleBreakpoint = (editor: Ace.Editor, row: number) => {
   */
 };
 
-
-
 const isNotGutterClick = (e: React.MouseEvent | MouseEvent) => {
   const target = e.target! as HTMLDivElement;
   return (
@@ -171,23 +169,22 @@ const getRowFromAceGutterElement = (elem: HTMLDivElement) => {
   return parseInt(elem.textContent!, 10) - 1; // Please NEVER DISABLE LINE NUMBERS.
 };
 
-const makeHandleGutterClick = (
-  handleEditorUpdateBreakpoints: DispatchProps['handleEditorUpdateBreakpoints']
-) => (e: AceMouseEvent) => {
-  if (isNotGutterClick(e.domEvent) || !e.editor.isFocused()) {
-    return;
-  }
-  // Breakpoint related.
-  // const row = e.getDocumentPosition().row;
-  const target = e.domEvent.target! as HTMLDivElement;
-  const row = getRowFromAceGutterElement(target);
+const makeHandleGutterClick =
+  (handleEditorUpdateBreakpoints: DispatchProps['handleEditorUpdateBreakpoints']) =>
+  (e: AceMouseEvent) => {
+    if (isNotGutterClick(e.domEvent) || !e.editor.isFocused()) {
+      return;
+    }
+    // Breakpoint related.
+    // const row = e.getDocumentPosition().row;
+    const target = e.domEvent.target! as HTMLDivElement;
+    const row = getRowFromAceGutterElement(target);
 
-  toggleBreakpoint(e.editor, row);
+    toggleBreakpoint(e.editor, row);
 
-  e.stop();
-  handleEditorUpdateBreakpoints(e.editor.session.getBreakpoints());
-};
-
+    e.stop();
+    handleEditorUpdateBreakpoints(e.editor.session.getBreakpoints());
+  };
 
 // Note: This is untestable/unused because JS-hint has been removed.
 const makeHandleAnnotationChange = (session: Ace.EditSession) => () => {
@@ -263,15 +260,17 @@ const EditorBase = React.memo(
       evaluate: handleEditorEval
     };
 
-
-    const contextMenuHandlers: ContextMenuHandlers = React.useMemo(() => ({
-      toggleBreakpoint: (row: number) => {
-        if (!reactAceRef.current) {
-          return;
+    const contextMenuHandlers: ContextMenuHandlers = React.useMemo(
+      () => ({
+        toggleBreakpoint: (row: number) => {
+          if (!reactAceRef.current) {
+            return;
+          }
+          toggleBreakpoint(reactAceRef.current?.editor, row);
         }
-        toggleBreakpoint(reactAceRef.current?.editor, row);
-      },
-    }), [reactAceRef]);
+      }),
+      [reactAceRef]
+    );
 
     // Handles input into AceEditor causing app to scroll to the top on iOS Safari
     React.useEffect(() => {
@@ -302,7 +301,6 @@ const EditorBase = React.memo(
     // already defined and doesn't do it, so it is now OK to keep calling this
     // unconditionally.
     selectMode(sourceChapter, sourceVariant, externalLibraryName);
-
 
     // This needs to be defined later, unfortunately.
     // Too tedious to rearrange the code otherwise.
@@ -347,8 +345,6 @@ const EditorBase = React.memo(
         moveCursor(reactAceRef.current.editor, newCursorPosition);
       }
     }, [props.newCursorPosition]);
-
-    
 
     const aceEditorProps: IAceEditorProps = {
       className: 'react-ace',
@@ -407,13 +403,13 @@ const EditorBase = React.memo(
       ]
     );
 
-     // ----------------- BIND CONTEXT MENU ----------------
+    // ----------------- BIND CONTEXT MENU ----------------
 
     // const [isContextMenuOpen, setContextMenuOpen] = React.useState(false);
 
     const showContextMenu = React.useCallback(
       (e: MouseEvent) => {
-        console.log("showContextMenu");
+        console.log('showContextMenu');
         const editor = reactAceRef.current!.editor;
         if (isNotGutterClick(e) /*|| !editor.isFocused()*/) {
           console.log(isNotGutterClick(e));
@@ -472,7 +468,7 @@ const EditorBase = React.memo(
         /* eslint-enable */
       }
     });
-    console.log("re-render editor");
+    console.log('re-render editor');
     return (
       <HotKeys className="Editor" handlers={handlers}>
         <div className="row editor-react-ace">
@@ -484,7 +480,14 @@ const EditorBase = React.memo(
 );
 
 // don't create a new list every render.
-const hooks = [useHighlighting, useNavigation, useTypeInference, useShareAce, useRefactor, useComments];
+const hooks = [
+  useHighlighting,
+  useNavigation,
+  useTypeInference,
+  useShareAce,
+  useRefactor,
+  useComments
+];
 
 const Editor = React.forwardRef<AceEditor, EditorProps>((props, ref) => (
   <EditorBase {...props} hooks={hooks} ref={ref} />

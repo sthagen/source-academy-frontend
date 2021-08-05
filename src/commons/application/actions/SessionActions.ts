@@ -107,26 +107,26 @@ export const submitGrading = (
   submissionId: number,
   questionId: number,
   gradeAdjustment: number = 0,
-  xpAdjustment: number = 0,
+  xpAdjustment: number = 0
 ) =>
   action(SUBMIT_GRADING, {
     submissionId,
     questionId,
     gradeAdjustment,
-    xpAdjustment,
+    xpAdjustment
   });
 
 export const submitGradingAndContinue = (
   submissionId: number,
   questionId: number,
   gradeAdjustment: number = 0,
-  xpAdjustment: number = 0,
+  xpAdjustment: number = 0
 ) =>
   action(SUBMIT_GRADING_AND_CONTINUE, {
     submissionId,
     questionId,
     gradeAdjustment,
-    xpAdjustment,
+    xpAdjustment
   });
 
 export const reautogradeSubmission = (submissionId: number) =>

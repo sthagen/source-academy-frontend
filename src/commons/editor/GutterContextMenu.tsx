@@ -23,8 +23,12 @@ export default function ContextMenu(props: ContextMenuProps) {
 
   return (
     <Menu onContextMenu={() => false}>
-      { handlers["toggleBreakpoint"] && <MenuItem icon="full-circle" text="Toggle Breakpoint" onClick={apply('toggleBreakpoint')} /> }
-      { handlers["createCommentPrompt"] && <MenuItem icon="comment" text="Add comment" onClick={apply('createCommentPrompt')} /> }
+      {handlers['toggleBreakpoint'] && (
+        <MenuItem icon="full-circle" text="Toggle Breakpoint" onClick={apply('toggleBreakpoint')} />
+      )}
+      {handlers['createCommentPrompt'] && (
+        <MenuItem icon="comment" text="Add comment" onClick={apply('createCommentPrompt')} />
+      )}
     </Menu>
   );
 }
