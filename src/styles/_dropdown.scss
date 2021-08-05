@@ -46,12 +46,29 @@ div.#{$ns}-dialog.help {
       flex-shrink: 0;
       padding-bottom: 1.75em;
       display: flex;
-
-      .profile-image {
-        width: 10em;
-        height: 10em;
-        object-fit: cover;
+      .profile-image-container {
+        position: relative;
+        .profile-image {
+          width: 10em;
+          height: 10em;
+          object-fit: cover;
+        }
+        .profile-image-edit-button {
+          cursor: pointer;
+          position: absolute;
+          top: 0;
+          right: 0;
+          padding: 0.25em;
+          color: rgb(25,25,25,0.65);
+          background-color: rgb(120,120,120,0.5);
+          
+          &:hover {
+            background-color: rgb(200,200,200,0.9);
+            color: rgb(25,25,25,1);
+          }
+        }
       }
+      
 
       .profile-username {
         padding-left: 2em;
@@ -216,6 +233,28 @@ div.#{$ns}-dialog.help {
 
     &.value-bar > div {
       background-color: #9ac0d8;
+    }
+  }
+}
+
+
+.profile-image-mini {
+  width: 1.3em;
+  height: 1.3em;
+  object-fit: cover;
+  margin-right: 0.3em;
+}
+
+.profile-editor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .profile-zoom {
+    padding-top: 0.5em;
+    display: flex;
+    label {
+      padding-right: 1em;
     }
   }
 }

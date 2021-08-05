@@ -1,5 +1,6 @@
-import { Drawer, NonIdealState, Spinner } from '@blueprintjs/core';
+import { AnchorButton, Button, Classes, Dialog, Drawer, Icon, Intent, NonIdealState, Spinner } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
+import { Tooltip2 } from '@blueprintjs/popover2';
 import * as React from 'react';
 
 import { Role } from '../application/ApplicationTypes';
@@ -10,7 +11,13 @@ import {
   AssessmentStatuses,
   GradingStatuses
 } from '../assessment/AssessmentTypes';
+// @ts-ignore
+import { request } from '../sagas/RequestsSaga';
+// @ts-ignore
+import Constants from '../utils/Constants';
+import { showSimpleConfirmDialog } from '../utils/DialogHelper';
 import ProfileCard from './ProfileCard';
+import ProfileEditor from './ProfileEditor';
 
 type ProfileProps = DispatchProps & StateProps & OwnProps;
 
@@ -30,13 +37,59 @@ type OwnProps = {
   onClose: () => void;
 };
 
-class Profile extends React.Component<ProfileProps, {}> {
+interface LocalState {
+  editing: boolean;
+}
+
+class Profile extends React.Component<ProfileProps, LocalState> {
+  profileEditorRef: React.RefObject<ProfileEditor>;
+  constructor(props: Readonly<ProfileProps>) {
+    super(props);
+    this.profileEditorRef = React.createRef();
+  }
   public componentDidMount() {
     if (this.props.name && this.props.role && !this.props.assessmentOverviews) {
       // If assessment overviews are not loaded, fetch them
       this.props.handleAssessmentOverviewFetch();
     }
+    this.setState({
+      editing: false
+    });
   }
+
+  public setEditing(value: boolean) {
+    this.setState({
+      editing: value,
+    })
+  }
+
+  public async confirmCancel() {
+    const confirm = await showSimpleConfirmDialog({
+      contents: `Cancel and discard changes?`,
+      negativeLabel: 'No',
+      positiveIntent: 'danger',
+      positiveLabel: 'Yes, discard changes'
+    });
+    if (confirm) {
+      this.setState({
+        editing: false
+      })
+    }
+  }
+
+  public async saveImage() {
+    const img = this.profileEditorRef.current?.getImg();
+    console.log(img);
+    // const { accessToken, refreshToken } = store.getState().session;
+    
+    // await request(`/user/profile_image`, 'PUT',{
+    //   body: img!,
+    //   accessToken: 
+    // })
+  }
+
+
+
 
   public render() {
     const isLoaded = this.props.name && this.props.role && this.props.assessmentOverviews;
@@ -50,21 +103,20 @@ class Profile extends React.Component<ProfileProps, {}> {
         item => item.status === AssessmentStatuses.submitted
       ).length;
 
-      const userDetails = (
+      const userDetails =  
         <div className="profile-header">
-          <img className="profile-image" src={this.props.profilePic} alt="profile"></img>
+          <div className="profile-image-container">
+            <img className="profile-image" src={this.props.profilePic} alt="profile"></img>
+            <div className="profile-image-edit-button" onClick={() => this.setEditing(true)}>
+              <Icon  icon="edit" />
+            </div>
+          </div>
+          
           <div className="profile-username">
             <div className="name">{this.props.name}</div>
             <div className="role">{this.props.role}</div>
-            {/* <EditableText
-              multiline={true}
-              onChange={() => {}}
-              placeholder="Enter card background URL here"
-              value={this.props.name}
-            /> */}
           </div>
         </div>
-      );
 
       if (numClosed === 0) {
         content = (
@@ -180,10 +232,44 @@ class Profile extends React.Component<ProfileProps, {}> {
       }
     }
 
+    const userProfilePic = <img className='profile-image-mini' src={this.props.profilePic} alt='profile-mini'/>
+    const profileEditorDialog = 
+      <Dialog
+        icon={IconNames.ERROR}
+        isCloseButtonShown={true}
+        isOpen={this.state && this.state.editing}
+        // onClose={}
+        title="Edit Profile Picture"
+      >
+        <div className={Classes.DIALOG_BODY}>
+          <ProfileEditor
+            defaultImage="https://picsum.photos/500/700"
+            ref={this.profileEditorRef}
+          />
+        </div>
+        <div className={Classes.DIALOG_FOOTER}>
+            <div className={Classes.DIALOG_FOOTER_ACTIONS}>
+                <Tooltip2 content="This button is hooked up to close the dialog.">
+                    <Button 
+                      icon="cross"
+                      intent={Intent.DANGER}
+                      onClick={ () => this.confirmCancel() }
+                    >Cancel</Button>
+                </Tooltip2>
+                <AnchorButton
+                    onClick={ () => this.saveImage()}
+                    icon="floppy-disk"
+                    intent={Intent.PRIMARY}
+                >
+                    Save
+                </AnchorButton>
+            </div>
+        </div>
+      </Dialog>
     return (
       <Drawer
         className="profile"
-        icon={IconNames.USER}
+        icon={userProfilePic}
         isCloseButtonShown={true}
         isOpen={this.props.isOpen}
         onClose={this.props.onClose}
@@ -191,6 +277,7 @@ class Profile extends React.Component<ProfileProps, {}> {
         position="left"
         size={'30%'}
       >
+        {profileEditorDialog}
         {content}
       </Drawer>
     );

@@ -37,6 +37,7 @@ type StateProps = {
   role?: Role;
   title: string;
   name?: string;
+  profilePic?: string;
 };
 
 const NavigationBar: React.FC<NavigationBarProps> = props => {
@@ -285,7 +286,7 @@ const NavigationBar: React.FC<NavigationBarProps> = props => {
         <NavbarDivider className="default-divider" />
       </div>
 
-      <Dropdown handleLogOut={props.handleLogOut} name={props.name} />
+      <Dropdown handleLogOut={props.handleLogOut} name={props.name} profilePic={props.profilePic}/>
     </NavbarGroup>
   );
 

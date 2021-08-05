@@ -31,6 +31,7 @@ export type StateProps = {
   role?: Role;
   title: string;
   name?: string;
+  profilePic?: string;
 };
 
 const Application: React.FC<ApplicationProps> = props => {
@@ -126,6 +127,7 @@ const Application: React.FC<ApplicationProps> = props => {
         role={props.role}
         name={props.name}
         title={props.title}
+        profilePic={props.profilePic}
       />
       <div className="Application__main">
         {disabled && (
