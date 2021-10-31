@@ -6,6 +6,7 @@ Array [
     "head": Object {
       ":::pre-declared names::": Symbol(),
     },
+    "id": "-1",
     "name": "global",
     "tail": null,
   },
@@ -13,6 +14,13 @@ Array [
   Symbol(),
   Object {
     "head": Object {
+      "3": [Function],
+      "4": [Function],
+      "5": [Function],
+      "6": [Function],
+      "7": [Function],
+      "8": [Function],
+      "9": [Function],
       "fn": [Function],
       "x": Array [
         "long string",
@@ -78,6 +86,7 @@ Array [
         ],
       ],
     },
+    "id": "2",
     "name": "programEnvironment",
     "tail": Object {
       "head": Object {
@@ -126,11 +135,13 @@ Array [
         "stream_reverse": [Function],
         "stream_to_list": [Function],
       },
+      "id": "1",
       "name": "programEnvironment",
       "tail": Object {
         "head": Object {
           ":::pre-declared names::": Symbol(),
         },
+        "id": "-1",
         "name": "global",
         "tail": null,
       },
@@ -203,6 +214,20 @@ Array [
       ],
     ],
   ],
+  "3:= ",
+  [Function],
+  "4:= ",
+  [Function],
+  "5:= ",
+  [Function],
+  "6:= ",
+  [Function],
+  "7:= ",
+  [Function],
+  "8:= ",
+  [Function],
+  "9:= ",
+  [Function],
 ]
 `;
 
@@ -212,6 +237,7 @@ Array [
     "head": Object {
       ":::pre-declared names::": Symbol(),
     },
+    "id": "-1",
     "name": "global",
     "tail": null,
   },
@@ -219,6 +245,10 @@ Array [
   Symbol(),
   Object {
     "head": Object {
+      "12": [Function],
+      "13": [Function],
+      "14": [Function],
+      "15": [Function],
       "fn": [Function],
       "l": Array [
         1,
@@ -294,6 +324,7 @@ Array [
         4,
       ],
     },
+    "id": "11",
     "name": "programEnvironment",
     "tail": Object {
       "head": Object {
@@ -342,11 +373,13 @@ Array [
         "stream_reverse": [Function],
         "stream_to_list": [Function],
       },
+      "id": "10",
       "name": "programEnvironment",
       "tail": Object {
         "head": Object {
           ":::pre-declared names::": Symbol(),
         },
+        "id": "-1",
         "name": "global",
         "tail": null,
       },
@@ -429,6 +462,14 @@ Array [
       ],
     ],
   ],
+  "12:= ",
+  [Function],
+  "13:= ",
+  [Function],
+  "14:= ",
+  [Function],
+  "15:= ",
+  [Function],
 ]
 `;
 
@@ -438,6 +479,7 @@ Array [
     "head": Object {
       ":::pre-declared names::": Symbol(),
     },
+    "id": "-1",
     "name": "global",
     "tail": null,
   },
@@ -472,6 +514,7 @@ Array [
         ],
       ],
     },
+    "id": "17",
     "name": "programEnvironment",
     "tail": Object {
       "head": Object {
@@ -520,11 +563,13 @@ Array [
         "stream_reverse": [Function],
         "stream_to_list": [Function],
       },
+      "id": "16",
       "name": "programEnvironment",
       "tail": Object {
         "head": Object {
           ":::pre-declared names::": Symbol(),
         },
+        "id": "-1",
         "name": "global",
         "tail": null,
       },
@@ -567,6 +612,7 @@ Array [
     "head": Object {
       ":::pre-declared names::": Symbol(),
     },
+    "id": "-1",
     "name": "global",
     "tail": null,
   },
@@ -574,6 +620,8 @@ Array [
   Symbol(),
   Object {
     "head": Object {
+      "20": [Function],
+      "21": [Function],
       "e": Array [
         Array [
           3,
@@ -648,6 +696,7 @@ Array [
         ],
       ],
     },
+    "id": "19",
     "name": "programEnvironment",
     "tail": Object {
       "head": Object {
@@ -696,11 +745,13 @@ Array [
         "stream_reverse": [Function],
         "stream_to_list": [Function],
       },
+      "id": "18",
       "name": "programEnvironment",
       "tail": Object {
         "head": Object {
           ":::pre-declared names::": Symbol(),
         },
+        "id": "-1",
         "name": "global",
         "tail": null,
       },
@@ -783,6 +834,10 @@ Array [
       ],
     ],
   ],
+  "20:= ",
+  [Function],
+  "21:= ",
+  [Function],
 ]
 `;
 
@@ -792,6 +847,7 @@ Array [
     "head": Object {
       ":::pre-declared names::": Symbol(),
     },
+    "id": "-1",
     "name": "global",
     "tail": null,
   },
@@ -799,11 +855,14 @@ Array [
   Symbol(),
   Object {
     "head": Object {
+      "24": [Function],
+      "28": [Function],
       "f": [Function],
       "x": 0,
       "y": 10,
       "z": [Function],
     },
+    "id": "23",
     "name": "programEnvironment",
     "tail": Object {
       "head": Object {
@@ -852,11 +911,13 @@ Array [
         "stream_reverse": [Function],
         "stream_to_list": [Function],
       },
+      "id": "22",
       "name": "programEnvironment",
       "tail": Object {
         "head": Object {
           ":::pre-declared names::": Symbol(),
         },
+        "id": "-1",
         "name": "global",
         "tail": null,
       },
@@ -869,6 +930,8 @@ Array [
   "f:= ",
   [Function],
   "z:= ",
+  [Function],
+  "24:= ",
   [Function],
   Object {
     "callExpression": Object {
@@ -910,16 +973,21 @@ Array [
       "type": "CallExpression",
     },
     "head": Object {
+      "27": [Function],
       "x": 11,
     },
+    "id": "25",
     "name": "f",
     "tail": Object {
       "head": Object {
+        "24": [Function],
+        "28": [Function],
         "f": [Function],
         "x": 0,
         "y": 10,
         "z": [Function],
       },
+      "id": "23",
       "name": "programEnvironment",
       "tail": Object {
         "head": Object {
@@ -968,11 +1036,13 @@ Array [
           "stream_reverse": [Function],
           "stream_to_list": [Function],
         },
+        "id": "22",
         "name": "programEnvironment",
         "tail": Object {
           "head": Object {
             ":::pre-declared names::": Symbol(),
           },
+          "id": "-1",
           "name": "global",
           "tail": null,
         },
@@ -981,6 +1051,8 @@ Array [
   },
   "x: ",
   11,
+  "27:= ",
+  [Function],
 ]
 `;
 
@@ -992,6 +1064,7 @@ Array [
       "accumulate": [Function],
       "pair": [Function],
     },
+    "id": "-1",
     "name": "global",
     "tail": null,
   },
@@ -1003,6 +1076,7 @@ Array [
   [Function],
   Object {
     "head": Object {
+      "31": [Function],
       "x": Array [
         1,
         Array [
@@ -1014,6 +1088,7 @@ Array [
         ],
       ],
     },
+    "id": "30",
     "name": "programEnvironment",
     "tail": Object {
       "head": Object {
@@ -1062,6 +1137,7 @@ Array [
         "stream_reverse": [Function],
         "stream_to_list": [Function],
       },
+      "id": "29",
       "name": "programEnvironment",
       "tail": Object {
         "head": Object {
@@ -1069,6 +1145,7 @@ Array [
           "accumulate": [Function],
           "pair": [Function],
         },
+        "id": "-1",
         "name": "global",
         "tail": null,
       },
@@ -1094,6 +1171,7 @@ Array [
     "head": Object {
       ":::pre-declared names::": Symbol(),
     },
+    "id": "-1",
     "name": "global",
     "tail": null,
   },
@@ -1103,6 +1181,7 @@ Array [
     "head": Object {
       "x": Array [],
     },
+    "id": "33",
     "name": "programEnvironment",
     "tail": Object {
       "head": Object {
@@ -1151,11 +1230,13 @@ Array [
         "stream_reverse": [Function],
         "stream_to_list": [Function],
       },
+      "id": "32",
       "name": "programEnvironment",
       "tail": Object {
         "head": Object {
           ":::pre-declared names::": Symbol(),
         },
+        "id": "-1",
         "name": "global",
         "tail": null,
       },
