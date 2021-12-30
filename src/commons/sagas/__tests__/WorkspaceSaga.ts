@@ -4,6 +4,9 @@ import { Finished, Variant } from 'js-slang/dist/types';
 import { call } from 'redux-saga/effects';
 import { expectSaga } from 'redux-saga-test-plan';
 import { updateInfiniteLoopEncountered } from 'src/commons/application/actions/SessionActions';
+import { addEvent } from 'src/features/achievement/AchievementActions';
+import { EventType } from 'src/features/achievement/AchievementTypes';
+import { nativeJSRun } from 'src/features/nativeJS/NativeJSActions';
 
 import {
   beginInterruptExecution,
@@ -15,7 +18,7 @@ import {
   evalTestcaseFailure,
   evalTestcaseSuccess
 } from '../../application/actions/InterpreterActions';
-import { defaultState, OverallState } from '../../application/ApplicationTypes';
+import { defaultState, nativeJSLanguage, OverallState } from '../../application/ApplicationTypes';
 import { externalLibraries, ExternalLibraryName } from '../../application/types/ExternalTypes';
 import {
   BEGIN_DEBUG_PAUSE,
@@ -176,6 +179,23 @@ describe('EVAL_EDITOR', () => {
         })
         .silentRun()
     );
+  });
+
+  test('ensure nativeJS program skips source specific pre-processing and gets run by NativeJsSaga', () => {
+    const workspaceLocation = 'playground';
+    const editorValue: string = "1+'1';";
+    const context = createContext(nativeJSLanguage.chapter, nativeJSLanguage.variant);
+    const newDefaultState = generateDefaultState(workspaceLocation, { context, editorValue });
+
+    return expectSaga(workspaceSaga)
+      .withState(newDefaultState)
+      .put(addEvent([EventType.RUN_CODE]))
+      .put(nativeJSRun({ workspace: workspaceLocation, program: editorValue }))
+      .dispatch({
+        type: EVAL_EDITOR,
+        payload: { workspaceLocation }
+      })
+      .silentRun();
   });
 });
 
